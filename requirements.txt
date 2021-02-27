@@ -1,0 +1,4 @@
+furo==2021.2.27b26
+Sphinx==3.5.1
+sphinx-copybutton==0.3.1
+sphinx-inline-tabs==2020.10.19b4
