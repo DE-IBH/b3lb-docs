@@ -11,16 +11,16 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
-        build-command: make dirhtml ; find .
-        pre-build-command: pip install -r requirements.txt
+        build-command: make dirhtml
+        pre-build-command: pip install -r requirements.txt ; find .
     - uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
-        path: docs/_build/dirhtml/
+        path: docs/build/dirhtml/
     - name: Publish documentation
       run: |
         git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/_build/dirhtml/* gh-pages/
+        cp -r docs/build/dirhtml/* gh-pages/
         cd gh-pages
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
