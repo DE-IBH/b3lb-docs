@@ -1,0 +1,273 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Django Admin Commands" href="../commands/" /><link rel="prev" title="Container Images" href="../images/" />
+
+    <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
+        <title>Configuration - b3lb 1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/styles/furo.css?digest=8304b39bb3b7aeb8294a71b3712567f018b3dac4">
+    <link rel="stylesheet" href="../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #D13239;
+  --color-brand-content: #D13239;
+  --color-announcement-background: #D13239;
+  --color-sidebar-background: #002A55;
+  --color-sidebar-search-background: #002A55;
+  --color-admonition-background: #002A55;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #D13239;
+  --color-brand-content: #D13239;
+  --color-announcement-background: #D13239;
+  --color-sidebar-background: #002A55;
+  --color-sidebar-search-background: #002A55;
+  --color-admonition-background: #002A55;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #D13239;
+  --color-brand-content: #D13239;
+  --color-announcement-background: #D13239;
+  --color-sidebar-background: #002A55;
+  --color-sidebar-search-background: #002A55;
+  --color-admonition-background: #002A55;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #D13239;
+  --color-brand-content: #D13239;
+  --color-announcement-background: #D13239;
+  --color-sidebar-background: #002A55;
+  --color-sidebar-search-background: #002A55;
+  --color-admonition-background: #002A55;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     <em>Documentation is WIP</em> 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../"><div class="brand">b3lb 1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../">
+  
+  
+  <span class="sidebar-brand-text">b3lb 1.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search/">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../about/">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../images/">Container Images</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/">Django Admin Commands</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You need to set secure credentials for all passwords and secrets.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">loadbalancer.settings_base</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># create a secret key</span>
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s2">"XXXXXX"</span>
+
+
+<span class="c1"># Database</span>
+<span class="c1"># https://docs.djangoproject.com/en/3.1/ref/settings/#databases</span>
+
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'default'</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">'ENGINE'</span><span class="p">:</span> <span class="s1">'django.db.backends.postgresql'</span><span class="p">,</span>
+        <span class="s1">'NAME'</span><span class="p">:</span> <span class="s1">'b3lb'</span><span class="p">,</span>
+        <span class="s1">'USER'</span><span class="p">:</span> <span class="s1">'b3lb'</span><span class="p">,</span>
+        <span class="s1">'PASSWORD'</span><span class="p">:</span> <span class="s1">'XXXXXX'</span><span class="p">,</span>
+        <span class="s1">'HOST'</span><span class="p">:</span> <span class="s1">'db'</span><span class="p">,</span>
+        <span class="s1">'PORT'</span><span class="p">:</span> <span class="s1">'5432'</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Configure Celery</span>
+<span class="n">CELERY_BROKER_URL</span> <span class="o">=</span> <span class="s1">'amqp://user:XXXXXX@rabbitmq:5672/'</span>
+
+<span class="c1"># Expire task results after 1h</span>
+<span class="n">CELERY_RESULT_EXPIRES</span> <span class="o">=</span> <span class="mi">3600</span>
+
+<span class="c1"># Django Cache</span>
+<span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"default"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"BACKEND"</span><span class="p">:</span> <span class="s2">"django_redis.cache.RedisCache"</span><span class="p">,</span>
+        <span class="s2">"LOCATION"</span><span class="p">:</span> <span class="s2">"redis://redis:6379/1"</span><span class="p">,</span>
+        <span class="s2">"OPTIONS"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"CLIENT_CLASS"</span><span class="p">:</span> <span class="s2">"django_redis.client.DefaultClient"</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># Django ORM Caching</span>
+<span class="n">CACHEOPS_REDIS</span> <span class="o">=</span> <span class="s2">"redis://redis:6379/2"</span>
+
+
+<span class="c1"># Internationalization</span>
+<span class="c1"># https://docs.djangoproject.com/en/3.1/topics/i18n/</span>
+
+<span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s1">'de-de'</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s1">'Europe/Berlin'</span>
+
+
+<span class="c1"># B3LB SETTINGS</span>
+
+<span class="n">API_BASE_DOMAIN</span> <span class="o">=</span> <span class="s2">"api.examples.com"</span>
+<span class="n">ASSETS_FOLDER_URL</span> <span class="o">=</span> <span class="s2">"https://assets.examples.com/logos"</span>
+</pre></div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../commands/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Django Admin Commands</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../images/">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Container Images</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2020-2021 IBH IT-Service GmbH
+            |
+            <a class="muted-link" href="../_sources/configuration.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/tabs.js"></script>
+    <script src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>
