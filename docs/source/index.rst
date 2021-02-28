@@ -16,6 +16,7 @@ B3LB - BigBlueButton load balancer
 
    This project uses BigBlueButton and is not endorsed or certified by BigBlueButton Inc. BigBlueButton and the BigBlueButton Logo are trademarks of BigBlueButton Inc.
 
+This documentation is licensed under the Creative Commons Attribution-ShareAlike 4.0 International license.
 
 .. toctree::
    :hidden:
