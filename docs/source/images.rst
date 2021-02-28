@@ -3,6 +3,8 @@ Container Images
 
 B3LB provides in three different docker image provided on `Docker Hub <https://hub.docker.com/search?q=b3lb&type=image>`_ and `GitHub Packages <https://github.com/orgs/DE-IBH/packages?ecosystem=docker>`_. The images can be build from source using the provided `Dockerfiles <https://github.com/DE-IBH/b3lb/tree/main/docker>`_.
 
+.. hint::
+    It is intentional that there are no `b3lb:latest` nor `b3lb-static:latest` image tags available.
 
 b3lb
 ----

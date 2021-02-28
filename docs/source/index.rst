@@ -24,3 +24,4 @@ B3LB is a open source `BigBlueButton API <https://docs.bigbluebutton.org/dev/api
    deployment
    images
    configuration
+   commands
