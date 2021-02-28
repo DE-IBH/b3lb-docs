@@ -26,6 +26,7 @@ jobs:
         name: DocumentationHTML
         path: docs/build/dirhtml/
     - name: Publish documentation
+      if: github.event_name == 'push'
       run: |
         git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
         cp -r docs/build/dirhtml/* gh-pages/
@@ -37,6 +38,7 @@ jobs:
         # The above command will fail if no changes were present, so we ignore
         # the return code.
     - name: Push changes
+      if: github.event_name == 'push'
       uses: ad-m/github-push-action@master
       with:
         branch: gh-pages
