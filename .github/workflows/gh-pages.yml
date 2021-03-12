@@ -1,4 +1,4 @@
-name: "Deploy docs.b3lb.io"
+name: "Deploy b3lb documentation"
 
 on: 
   workflow_dispatch:
@@ -28,7 +28,7 @@ jobs:
     - name: Publish documentation
       if: github.event_name == 'push'
       run: |
-        git clone https://github.com/ammaraskar/sphinx-action-test.git --branch gh-pages --single-branch gh-pages
+        git clone https://github.com/DE-IBH/b3lb-docs.git --branch gh-pages --single-branch gh-pages
         cp -r docs/build/dirhtml/* gh-pages/
         cd gh-pages
         git config --local user.email "action@github.com"
@@ -44,4 +44,3 @@ jobs:
         branch: gh-pages
         directory: gh-pages
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        force: true
