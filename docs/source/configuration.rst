@@ -27,7 +27,7 @@ Configuration
     }
 
     # Configure Celery
-    CELERY_BROKER_URL = 'amqp://user:XXXXXX@rabbitmq:5672/'
+    CELERY_BROKER_URL = 'redis://:XXXXXX@redis:6379/3"
 
     # Expire task results after 1h
     CELERY_RESULT_EXPIRES = 3600
@@ -36,7 +36,7 @@ Configuration
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://redis:6379/1",
+            "LOCATION": "redis://:XXXXXX@redis:6379/1",
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient"
             },
@@ -44,7 +44,7 @@ Configuration
     }
 
     # Django ORM Caching
-    CACHEOPS_REDIS = "redis://redis:6379/2"
+    CACHEOPS_REDIS = "redis://:XXXXXX@redis:6379/2"
 
 
     # Internationalization
