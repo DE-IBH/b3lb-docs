@@ -24,8 +24,9 @@ BBB Frontend API
 - deployed on ASGI with `uvicorn <https://www.uvicorn.org/>`_
 - HTTP call-outs are implementated async using `aiohttp <https://docs.aiohttp.org/>`_
 - support API key rollover using a second secret
-- prebuild responses for expensive API calls (getMeetings)
-- does not implement the BBB recording API
+- prebuild responses for expensive API calls (``getMeetings``)
+- limiting attendees or meetings per tenant
+- does not implement but blocks recording API calls
 
 
 Multitenancy
