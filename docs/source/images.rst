@@ -16,14 +16,14 @@ the ASGI application, Celery tasks and manamgenet CLI commands.
 
     ::
 
-        docker pull ibhde/b3lb:1.0.1
+        docker pull ibhde/b3lb:1.1.0
 
 
 .. tab:: GitHub Packages
 
     ::
 
-        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb:101
+        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb:1.1.0
 
 
 b3lb-static
@@ -36,14 +36,14 @@ assets for the Django admin UI and can be used to publish per-tenant assets.
 
     ::
 
-        docker pull ibhde/b3lb-static:1.0.1
+        docker pull ibhde/b3lb-static:1.1.0
 
 
 .. tab:: GitHub Packages
 
     ::
 
-        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-static:101
+        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-static:1.1.0
 
 
 
