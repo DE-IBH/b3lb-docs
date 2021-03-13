@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Django Admin Commands" href="../commands/" /><link rel="prev" title="Container Images" href="../images/" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Deployment" href="../deployment/" /><link rel="prev" title="Prerequisites" href="../prerequisites/" />
 
     <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
         <title>Configuration - b3lb 1.1 documentation</title>
@@ -138,9 +138,9 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../about/">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../deployment/">Deployment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../images/">Container Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prerequisites/">Prerequisites</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/">Django Admin Commands</a></li>
 </ul>
 
@@ -158,10 +158,47 @@
         </label>
         <div class="section" id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p><em>b3lb</em> is configured using a Django settings file (<code class="docutils literal notranslate"><span class="pre">settings.py</span></code>). You need to customize the following settings:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></dt><dd><p>The <a class="reference external" href="https://docs.djangoproject.com/en/3.1/ref/settings/#secret-key">secret key</a> for your Django deployment.</p>
+</dd>
+</dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>You need to set secure credentials for all passwords and secrets.</p>
+<p>The secret key needs to be unique, secure and kept confidential. A key could be generated using the <em>pwgen</em> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pwgen</span> <span class="o">-</span><span class="n">ys</span> <span class="mi">50</span> <span class="mi">1</span>
+</pre></div>
 </div>
+</div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">DATABASES</span></code></dt><dd><p>The <a class="reference external" href="https://docs.djangoproject.com/en/3.1/ref/settings/#databases">databases setting</a> for your Django deployment. The <code class="docutils literal notranslate"><span class="pre">default</span></code> database setting is used and should point to a PostgreSQL database.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CELERY_BROKER_URL</span></code></dt><dd><p>The <a class="reference external" href="https://docs.celeryproject.org/en/stable/userguide/configuration.html#std-setting-broker_url">broker URL</a> used by <em>Celery</em>. The broker needs to be the same on all <em>b3lb</em> instances.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CACHES</span></code></dt><dd><p>The <a class="reference external" href="https://docs.djangoproject.com/en/3.1/ref/settings/#caches">caches setting</a> for your Django deployment. The <code class="docutils literal notranslate"><span class="pre">default</span></code> cache is used by the worker nodes to cache BBB’s <code class="docutils literal notranslate"><span class="pre">getMeetings</span></code> XML data.</p>
+</dd>
+</dl>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>It is highly recommended to configure a powerful caching backend like <em>redis</em>. Running the worker nodes with limited caching will result in many database read requests with huge result sets. The worker nodes should use a shared cache if network throughput is non-expensive.</p>
+</div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">CACHEOPS_REDIS</span></code></dt><dd><p>This settings needs to configure a redis backend used for ORM caching using <a class="reference external" href="https://github.com/Suor/django-cacheops#setup">django-cacheops</a>. For frontend nodes it is recommend to use a local redis instance to separate  failure domains.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">LANGUAGE_CODE</span></code></dt><dd><p>The <a class="reference external" href="https://docs.djangoproject.com/en/3.1/ref/settings/#language-code">language ID</a> to be used for the admin pages.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></dt><dd><p>The <a class="reference external" href="https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-TIME_ZONE">time zone</a> to be used.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">API_BASE_DOMAIN</span></code></dt><dd><p>The b3lb <a class="reference internal" href="../prerequisites/#prerequisites-dns"><span class="std std-ref">base domain</span></a>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ASSETS_FOLDER_URL</span></code></dt><dd><p>The URL prefix to build branding logo URLs.</p>
+</dd>
+</dl>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p><em>redis</em>  is used in the three different settings <code class="docutils literal notranslate"><span class="pre">CACHES</span></code>, <code class="docutils literal notranslate"><span class="pre">CELERY_BROKER_URL</span></code> and <code class="docutils literal notranslate"><span class="pre">CACHEOPS_REDIS</span></code>. It is highly recommended to use unique redis database identifiers for each setting.</p>
+</div>
+<p>To create your own <code class="docutils literal notranslate"><span class="pre">settings.py</span></code> use the following template:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">loadbalancer.settings_base</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="c1"># create a secret key</span>
@@ -183,16 +220,13 @@
 <span class="p">}</span>
 
 <span class="c1"># Configure Celery</span>
-<span class="n">CELERY_BROKER_URL</span> <span class="o">=</span> <span class="s1">'amqp://user:XXXXXX@rabbitmq:5672/'</span>
-
-<span class="c1"># Expire task results after 1h</span>
-<span class="n">CELERY_RESULT_EXPIRES</span> <span class="o">=</span> <span class="mi">3600</span>
+<span class="n">CELERY_BROKER_URL</span> <span class="o">=</span> <span class="s1">'redis://:XXXXXX@redis:6379/3"</span>
 
 <span class="c1"># Django Cache</span>
 <span class="n">CACHES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">"default"</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">"BACKEND"</span><span class="p">:</span> <span class="s2">"django_redis.cache.RedisCache"</span><span class="p">,</span>
-        <span class="s2">"LOCATION"</span><span class="p">:</span> <span class="s2">"redis://redis:6379/1"</span><span class="p">,</span>
+        <span class="s2">"LOCATION"</span><span class="p">:</span> <span class="s2">"redis://:XXXXXX@redis:6379/1"</span><span class="p">,</span>
         <span class="s2">"OPTIONS"</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">"CLIENT_CLASS"</span><span class="p">:</span> <span class="s2">"django_redis.client.DefaultClient"</span>
         <span class="p">},</span>
@@ -200,7 +234,7 @@
 <span class="p">}</span>
 
 <span class="c1"># Django ORM Caching</span>
-<span class="n">CACHEOPS_REDIS</span> <span class="o">=</span> <span class="s2">"redis://redis:6379/2"</span>
+<span class="n">CACHEOPS_REDIS</span> <span class="o">=</span> <span class="s2">"redis://:XXXXXX@redis:6379/2"</span>
 
 
 <span class="c1"># Internationalization</span>
@@ -222,23 +256,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../commands/">
+          <a class="next-page" href="../deployment/">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Django Admin Commands</div>
+                <div class="title">Deployment</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../images/">
+          <a class="prev-page" href="../prerequisites/">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Container Images</div>
+                <div class="title">Prerequisites</div>
                 
               </div>
             </a>

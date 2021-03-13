@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="#" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Deployment" href="../deployment/" /><link rel="prev" title="B3LB - BigBlueButton load balancer" href="../" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="#" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Prerequisites" href="../prerequisites/" /><link rel="prev" title="B3LB - BigBlueButton load balancer" href="../" />
 
     <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
         <title>About - b3lb 1.1 documentation</title>
@@ -138,9 +138,9 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../deployment/">Deployment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../images/">Container Images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prerequisites/">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration/">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/">Django Admin Commands</a></li>
 </ul>
 
@@ -158,7 +158,18 @@
         </label>
         <div class="section" id="about">
 <h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
-<p>B3LB is designed for large scale-out BBB multitenancy deployments:</p>
+<p>B3LB is based on the <a class="reference external" href="https://www.djangoproject.com/">Django</a> Python Web framework and is designed to work in large scale-out deployments with 100+ BigBlueButton nodes and high attendee join rates.</p>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<img alt="../_images/b3lb-ref-design.svg" src="../_images/b3lb-ref-design.svg"/><p>To scale for a huge number of attendees it is possible to:</p>
+<ul class="simple">
+<li><p>scale-out the B3LB API frontends</p></li>
+<li><p>scale-out the B3LB polling workers</p></li>
+<li><p>scale-out your BBB nodes</p></li>
+</ul>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>multiple b3lb frontend instances</p></li>
 <li><p>backend BBB node polling using <a class="reference external" href="http://celeryproject.org/">Celery</a></p></li>
@@ -166,7 +177,7 @@
 <li><p>robust against high BBB node response times (i.e. due to ongoing DDoS attacks)</p></li>
 </ul>
 <div class="section" id="bbb-clustering">
-<h2>BBB Clustering<a class="headerlink" href="#bbb-clustering" title="Permalink to this headline">¶</a></h2>
+<h3>BBB Clustering<a class="headerlink" href="#bbb-clustering" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>supports a high number of BBB nodes</p></li>
 <li><p>different load balancing factors per cluster</p></li>
@@ -175,7 +186,7 @@
 </ul>
 </div>
 <div class="section" id="bbb-frontend-api">
-<h2>BBB Frontend API<a class="headerlink" href="#bbb-frontend-api" title="Permalink to this headline">¶</a></h2>
+<h3>BBB Frontend API<a class="headerlink" href="#bbb-frontend-api" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>deployed on ASGI with <a class="reference external" href="https://www.uvicorn.org/">uvicorn</a></p></li>
 <li><p>HTTP call-outs are implementated async using <a class="reference external" href="https://docs.aiohttp.org/">aiohttp</a></p></li>
@@ -186,7 +197,7 @@
 </ul>
 </div>
 <div class="section" id="multitenancy">
-<h2>Multitenancy<a class="headerlink" href="#multitenancy" title="Permalink to this headline">¶</a></h2>
+<h3>Multitenancy<a class="headerlink" href="#multitenancy" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>per-tenant API hostnames</p></li>
 <li><p>start presentation injection</p></li>
@@ -195,7 +206,7 @@
 </ul>
 </div>
 <div class="section" id="monitoring">
-<h2>Monitoring<a class="headerlink" href="#monitoring" title="Permalink to this headline">¶</a></h2>
+<h3>Monitoring<a class="headerlink" href="#monitoring" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>simple health-check URL</p></li>
 <li><p>simple json statistics URL</p></li>
@@ -203,17 +214,76 @@
 </ul>
 </div>
 </div>
+<div class="section" id="container-images">
+<h2>Container Images<a class="headerlink" href="#container-images" title="Permalink to this headline">¶</a></h2>
+<p>B3LB provides in three different docker image provided on <a class="reference external" href="https://hub.docker.com/search?q=b3lb&amp;type=image">Docker Hub</a> and <a class="reference external" href="https://github.com/orgs/DE-IBH/packages?ecosystem=docker">GitHub Packages</a>. The images can be build from source using the provided <a class="reference external" href="https://github.com/DE-IBH/b3lb/tree/main/docker">Dockerfiles</a>.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>It is intentional that there are no <cite>b3lb:latest</cite> nor <cite>b3lb-static:latest</cite> image tags available. You should always pick a explicit version for your deployment.</p>
+</div>
+<div class="section" id="b3lb">
+<h3>b3lb<a class="headerlink" href="#b3lb" title="Permalink to this headline">¶</a></h3>
+<p>This image contains the Django files of b3lb to run
+the ASGI application, Celery tasks and manamgenet CLI commands.</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--1">Docker Hub</label><div class="tab-content docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">ibhde</span><span class="o">/</span><span class="n">b3lb</span><span class="p">:</span><span class="mf">1.1</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--2">GitHub Packages</label><div class="tab-content docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">docker</span><span class="o">.</span><span class="n">pkg</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">de</span><span class="o">-</span><span class="n">ibh</span><span class="o">/</span><span class="n">b3lb</span><span class="o">/</span><span class="n">b3lb</span><span class="p">:</span><span class="mf">1.1</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="b3lb-static">
+<h3>b3lb-static<a class="headerlink" href="#b3lb-static" title="Permalink to this headline">¶</a></h3>
+<p>Uses the <a class="reference external" href="https://caddyserver.com/">Caddy</a> webserver to provide static
+assets for the Django admin UI and can be used to publish per-tenant assets.</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--1-input--1" name="tab-set--1" type="radio"/><label class="tab-label" for="tab-set--1-input--1">Docker Hub</label><div class="tab-content docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">ibhde</span><span class="o">/</span><span class="n">b3lb</span><span class="o">-</span><span class="n">static</span><span class="p">:</span><span class="mf">1.1</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--1-input--2" name="tab-set--1" type="radio"/><label class="tab-label" for="tab-set--1-input--2">GitHub Packages</label><div class="tab-content docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">docker</span><span class="o">.</span><span class="n">pkg</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">de</span><span class="o">-</span><span class="n">ibh</span><span class="o">/</span><span class="n">b3lb</span><span class="o">/</span><span class="n">b3lb</span><span class="o">-</span><span class="n">static</span><span class="p">:</span><span class="mf">1.1</span><span class="o">.</span><span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="b3lb-dev">
+<h3>b3lb-dev<a class="headerlink" href="#b3lb-dev" title="Permalink to this headline">¶</a></h3>
+<p>This is the development build of b3lb using Djangos single threaded build-in webserver. You should never use this in production.</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--2-input--1" name="tab-set--2" type="radio"/><label class="tab-label" for="tab-set--2-input--1">Docker Hub</label><div class="tab-content docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">ibhde</span><span class="o">/</span><span class="n">b3lb</span><span class="o">-</span><span class="n">dev</span><span class="p">:</span><span class="n">latest</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--2-input--2" name="tab-set--2" type="radio"/><label class="tab-label" for="tab-set--2-input--2">GitHub Packages</label><div class="tab-content docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">docker</span><span class="o">.</span><span class="n">pkg</span><span class="o">.</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">de</span><span class="o">-</span><span class="n">ibh</span><span class="o">/</span><span class="n">b3lb</span><span class="o">/</span><span class="n">b3lb</span><span class="o">-</span><span class="n">dev</span><span class="p">:</span><span class="n">latest</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
       </article>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../deployment/">
+          <a class="next-page" href="../prerequisites/">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Deployment</div>
+                <div class="title">Prerequisites</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -254,10 +324,20 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">About</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
 <li><a class="reference internal" href="#bbb-clustering">BBB Clustering</a></li>
 <li><a class="reference internal" href="#bbb-frontend-api">BBB Frontend API</a></li>
 <li><a class="reference internal" href="#multitenancy">Multitenancy</a></li>
 <li><a class="reference internal" href="#monitoring">Monitoring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#container-images">Container Images</a><ul>
+<li><a class="reference internal" href="#b3lb">b3lb</a></li>
+<li><a class="reference internal" href="#b3lb-static">b3lb-static</a></li>
+<li><a class="reference internal" href="#b3lb-dev">b3lb-dev</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

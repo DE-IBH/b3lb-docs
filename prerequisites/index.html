@@ -1,10 +1,10 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Django Admin Commands" href="../commands/" /><link rel="prev" title="Configuration" href="../configuration/" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Configuration" href="../configuration/" /><link rel="prev" title="About" href="../about/" />
 
     <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
-        <title>Deployment - b3lb 1.1 documentation</title>
+        <title>Prerequisites - b3lb 1.1 documentation</title>
       <link rel="stylesheet" href="../_static/styles/furo.css?digest=8304b39bb3b7aeb8294a71b3712567f018b3dac4">
     <link rel="stylesheet" href="../_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
@@ -118,7 +118,7 @@
       <a href="../"><div class="brand">b3lb 1.1 documentation</div></a>
     </div>
     <div class="header-right">
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
     </div>
@@ -138,9 +138,9 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../about/">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prerequisites/">Prerequisites</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration/">Configuration</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/">Django Admin Commands</a></li>
 </ul>
 
@@ -153,34 +153,89 @@
   <main class="main">
     <div class="content">
       <article role="main">
-        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="deployment">
-<h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
+        <div class="section" id="prerequisites">
+<h1>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>To deploy <em>b3lb</em> you need a running Docker environment:</p>
+<ul class="simple">
+<li><p>Docker Engine</p></li>
+<li><p>Docker Swarm</p></li>
+<li><p>Kubernetes</p></li>
+<li><p>…</p></li>
+</ul>
+</div>
+<div class="section" id="dns">
+<span id="prerequisites-dns"></span><h2>DNS<a class="headerlink" href="#dns" title="Permalink to this headline">¶</a></h2>
+<p><em>B3LB</em> uses the following domain scheme:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">api.bbbconf.de</span></code></dt><dd><p>Base domain, use for admin and global metrics access, only</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tenant1.api.bbbconf.de</span></code></dt><dd><p>BBB API domain for the tenant <code class="docutils literal notranslate"><span class="pre">tentant1</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tenant1-001.api.bbbconf.de</span></code></dt><dd><p>BBB API domain for a additional secret for the tenant <code class="docutils literal notranslate"><span class="pre">tentant1</span></code></p>
+</dd>
+</dl>
+<p>It is recommended to add corresponding DNS RR using a wildcard to your zone file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">;</span> <span class="n">address</span> <span class="n">records</span> <span class="n">of</span> <span class="n">reverse</span> <span class="n">proxy</span> <span class="n">instances</span>
+<span class="n">api</span>         <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.1</span>
+            <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.2</span>
+            <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.3</span>
+            <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">1</span>
+            <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">2</span>
+            <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">3</span>
+<span class="p">;</span> <span class="n">wildcard</span> <span class="n">used</span> <span class="n">by</span> <span class="n">tenants</span>
+<span class="o">*</span>           <span class="n">CNAME</span>   <span class="n">api</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reverse-proxy">
+<h2>Reverse Proxy<a class="headerlink" href="#reverse-proxy" title="Permalink to this headline">¶</a></h2>
+<p>A reverse proxy with the following features is required:</p>
+<ul class="simple">
+<li><p>handle wildcard certificates using <a class="reference external" href="https://letsencrypt.org/docs/challenge-types/#dns-01-challenge">LE DNS-01 challenge</a> (<em>recommended</em>)</p></li>
+<li><p>restrict access to selected b3lb urls to protect admin &amp; metrics</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/traefik/traefik">traefik</a> has proven to work very well for <em>b3lb</em>.</p>
+</div>
+<div class="section" id="postgresql-database">
+<h2>PostgreSQL Database<a class="headerlink" href="#postgresql-database" title="Permalink to this headline">¶</a></h2>
+<p><em>b3lb</em> requires a database backend <a class="reference external" href="https://docs.djangoproject.com/en/3.1/ref/databases/">supported by Django</a>. It needs to be accessible by all <em>b3lb</em> frontend and worker instances.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Using PostgreSQL 9.5+ is highly recommended.</p>
+</div>
+<div class="section" id="deployment">
+<h3>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h3>
+<p>In</p>
+</div>
+</div>
 </div>
 
       </article>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../commands/">
+          <a class="next-page" href="../configuration/">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Django Admin Commands</div>
+                <div class="title">Configuration</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../configuration/">
+          <a class="prev-page" href="../about/">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Configuration</div>
+                <div class="title">About</div>
                 
               </div>
             </a>
@@ -189,7 +244,7 @@
         <div class="related-information">
               Copyright &#169; 2020-2021 IBH IT-Service GmbH
             |
-            <a class="muted-link" href="../_sources/deployment.rst.txt"
+            <a class="muted-link" href="../_sources/prerequisites.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -197,8 +252,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Prerequisites</a><ul>
+<li><a class="reference internal" href="#docker">Docker</a></li>
+<li><a class="reference internal" href="#dns">DNS</a></li>
+<li><a class="reference internal" href="#reverse-proxy">Reverse Proxy</a></li>
+<li><a class="reference internal" href="#postgresql-database">PostgreSQL Database</a><ul>
+<li><a class="reference internal" href="#deployment">Deployment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
