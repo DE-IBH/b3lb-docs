@@ -22,7 +22,7 @@ This documentation is licensed under the Creative Commons Attribution-ShareAlike
    :hidden:
 
    about
-   deployment
-   images
+   prerequisites
    configuration
+   deployment
    commands

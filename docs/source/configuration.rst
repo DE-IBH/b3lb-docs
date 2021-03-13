@@ -1,10 +1,47 @@
 Configuration
 =============
 
-.. warning::
-    You need to set secure credentials for all passwords and secrets.
+*b3lb* is configured using a Django settings file (``settings.py``). You need to customize the following settings:
 
-::
+``SECRET_KEY``
+    The `secret key <https://docs.djangoproject.com/en/3.1/ref/settings/#secret-key>`_ for your Django deployment.
+
+.. warning::
+    The secret key needs to be unique, secure and kept confidential. A key could be generated using the *pwgen* command::
+    
+        pwgen -ys 50 1
+
+``DATABASES``
+    The `databases setting <https://docs.djangoproject.com/en/3.1/ref/settings/#databases>`_ for your Django deployment. The ``default`` database setting is used and should point to a PostgreSQL database.
+
+``CELERY_BROKER_URL``
+    The `broker URL <https://docs.celeryproject.org/en/stable/userguide/configuration.html#std-setting-broker_url>`_ used by *Celery*. The broker needs to be the same on all *b3lb* instances.
+
+``CACHES``
+    The `caches setting <https://docs.djangoproject.com/en/3.1/ref/settings/#caches>`_ for your Django deployment. The ``default`` cache is used by the worker nodes to cache BBB's ``getMeetings`` XML data.
+
+.. hint::
+    It is highly recommended to configure a powerful caching backend like *redis*. Running the worker nodes with limited caching will result in many database read requests with huge result sets. The worker nodes should use a shared cache if network throughput is non-expensive.
+
+``CACHEOPS_REDIS``
+    This settings needs to configure a redis backend used for ORM caching using `django-cacheops <https://github.com/Suor/django-cacheops#setup>`_. For frontend nodes it is recommend to use a local redis instance to separate  failure domains.
+
+``LANGUAGE_CODE``
+    The `language ID <https://docs.djangoproject.com/en/3.1/ref/settings/#language-code>`_ to be used for the admin pages.
+
+``TIME_ZONE``
+    The `time zone <https://docs.djangoproject.com/en/3.1/ref/settings/#std:setting-TIME_ZONE>`_ to be used.
+
+``API_BASE_DOMAIN``
+    The b3lb :ref:`base domain<Prerequisites DNS>`.
+
+``ASSETS_FOLDER_URL``
+    The URL prefix to build branding logo URLs.
+
+.. hint::
+    *redis*  is used in the three different settings ``CACHES``, ``CELERY_BROKER_URL`` and ``CACHEOPS_REDIS``. It is highly recommended to use unique redis database identifiers for each setting.
+
+To create your own ``settings.py`` use the following template::
 
     from loadbalancer.settings_base import *
 
@@ -28,9 +65,6 @@ Configuration
 
     # Configure Celery
     CELERY_BROKER_URL = 'redis://:XXXXXX@redis:6379/3"
-
-    # Expire task results after 1h
-    CELERY_RESULT_EXPIRES = 3600
 
     # Django Cache
     CACHES = {
