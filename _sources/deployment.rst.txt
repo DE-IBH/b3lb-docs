@@ -14,7 +14,7 @@ Deployment
 
 
 .. hint::
-    You need at least to change the options tagged with ``TODO:`` in the following templates. You might use the templates with Jinja2 and set the variables ``ansible_fqdn``, ``api_base_domain``, ``tsig_key`` and ``tsig_secret`` appropriately.
+    You need at least to change the options tagged with ``TODO:`` in the following templates. You might use the templates with Jinja2 and set the variables ``ansible_fqdn``, ``api_base_domain``, ``assets_domain``, ``tsig_key`` and ``tsig_secret`` appropriately.
 
 
 .. tab:: docker-compose.yml
@@ -182,13 +182,13 @@ Deployment
               # logo & slide assets
               - traefik.enable=true
               - traefik.http.routers.assets.entrypoints=https
-              - traefik.http.routers.assets.rule=Host(`assets.bbbconf.de`)
+              - traefik.http.routers.assets.rule=Host(`{{ assets_domain }}`)
               - traefik.http.routers.assets.middlewares=endpoint-chain@file
               - traefik.http.routers.assets.tls=true
               - traefik.http.routers.assets.tls.options=default
               - traefik.http.routers.assets.tls.certResolver=acmeDNS
               - traefik.http.services.assets.loadbalancer.server.port=80
-              - "traefik.http.routers.assets.tls.domains[0].main=assets.bbbconf.de"
+              - "traefik.http.routers.assets.tls.domains[0].main={{ assets_domain }}"
             volumes:
               - ./data.d/b3lb/logos:/usr/share/caddy/logos:ro
               - ./data.d/b3lb/slides:/usr/share/caddy/slides:ro

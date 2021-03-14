@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="Django Admin Commands" href="../commands/" /><link rel="prev" title="Configuration" href="../configuration/" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="author" title="About these documents" href="../about/" /><link rel="index" title="Index" href="../genindex/" /><link rel="search" title="Search" href="../search/" /><link rel="next" title="First Steps" href="../steps/" /><link rel="prev" title="Configuration" href="../configuration/" />
 
     <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
         <title>Deployment - b3lb 1.1 documentation</title>
@@ -141,6 +141,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../prerequisites/">Prerequisites</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../configuration/">Configuration</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../steps/">First Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../commands/">Django Admin Commands</a></li>
 </ul>
 
@@ -169,7 +170,7 @@
 </dl>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
-<p>You need at least to change the options tagged with <code class="docutils literal notranslate"><span class="pre">TODO:</span></code> in the following templates. You might use the templates with Jinja2 and set the variables <code class="docutils literal notranslate"><span class="pre">ansible_fqdn</span></code>, <code class="docutils literal notranslate"><span class="pre">api_base_domain</span></code>, <code class="docutils literal notranslate"><span class="pre">tsig_key</span></code> and <code class="docutils literal notranslate"><span class="pre">tsig_secret</span></code> appropriately.</p>
+<p>You need at least to change the options tagged with <code class="docutils literal notranslate"><span class="pre">TODO:</span></code> in the following templates. You might use the templates with Jinja2 and set the variables <code class="docutils literal notranslate"><span class="pre">ansible_fqdn</span></code>, <code class="docutils literal notranslate"><span class="pre">api_base_domain</span></code>, <code class="docutils literal notranslate"><span class="pre">assets_domain</span></code>, <code class="docutils literal notranslate"><span class="pre">tsig_key</span></code> and <code class="docutils literal notranslate"><span class="pre">tsig_secret</span></code> appropriately.</p>
 </div>
 <div class="tab-set docutils container">
 <input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--1">docker-compose.yml</label><div class="tab-content docutils container">
@@ -334,13 +335,13 @@
       <span class="c1"># logo &amp; slide assets</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.enable=true</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.entrypoints=https</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.rule=Host(`assets.bbbconf.de`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.rule=Host(`{{ assets_domain }}`)</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.middlewares=endpoint-chain@file</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.tls=true</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.tls.options=default</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.tls.certResolver=acmeDNS</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.assets.loadbalancer.server.port=80</span>
-      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.assets.tls.domains[0].main=assets.bbbconf.de"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.assets.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">assets_domain</span><span class="nv"> </span><span class="s">}}"</span>
     <span class="nt">volumes</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/logos:/usr/share/caddy/logos:ro</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/slides:/usr/share/caddy/slides:ro</span>
@@ -542,12 +543,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../commands/">
+          <a class="next-page" href="../steps/">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Django Admin Commands</div>
+                <div class="title">First Steps</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
