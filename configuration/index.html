@@ -199,7 +199,7 @@
 <p><em>redis</em>  is used in the three different settings <code class="docutils literal notranslate"><span class="pre">CACHES</span></code>, <code class="docutils literal notranslate"><span class="pre">CELERY_BROKER_URL</span></code> and <code class="docutils literal notranslate"><span class="pre">CACHEOPS_REDIS</span></code>. It is highly recommended to use unique redis database identifiers for each setting.</p>
 </div>
 <p>To create your own <code class="docutils literal notranslate"><span class="pre">settings.py</span></code> use the following template:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">loadbalancer.settings_base</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">loadbalancer.settings_base</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="c1"># create a secret key</span>
 <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s2">"XXXXXX"</span>

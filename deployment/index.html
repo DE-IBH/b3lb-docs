@@ -158,6 +158,384 @@
         </label>
         <div class="section" id="deployment">
 <h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
+<p><em>b3lb</em> is distributed as Docker image and the following deployment blueprint is based on <a class="reference external" href="https://docs.docker.com/compose/">Docker Compose</a>. As reverse proxy <a class="reference external" href="https://github.com/traefik/traefik">traefik</a> is used. The following templates are provided:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code></dt><dd><p>The compose file deploying all services on a single node. For scale-out you need some deployment environment allowing you to scale the components.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">conf.d/traefik/config.yml</span></code></dt><dd><p>The traefik configuration.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">conf.d/traefik/traefik.yml</span></code></dt><dd><p>Static middlewares for traefik used in the compose file.</p>
+</dd>
+</dl>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>You need at least to change the options tagged with <code class="docutils literal notranslate"><span class="pre">TODO:</span></code> in the following templates. You might use the templates with Jinja2 and set the variables <code class="docutils literal notranslate"><span class="pre">ansible_fqdn</span></code>, <code class="docutils literal notranslate"><span class="pre">api_base_domain</span></code>, <code class="docutils literal notranslate"><span class="pre">tsig_key</span></code> and <code class="docutils literal notranslate"><span class="pre">tsig_secret</span></code> appropriately.</p>
+</div>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--1">docker-compose.yml</label><div class="tab-content docutils container">
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span> <span class="s">'3'</span>
+
+<span class="nt">services</span><span class="p">:</span>
+  <span class="c1"># reverse proxy</span>
+  <span class="nt">traefik</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">traefik:2.4.7</span>
+    <span class="nt">read_only</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">ports</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">80:80</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">443:443</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./conf.d/traefik/config.yml:/etc/traefik/config.yml:ro</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./conf.d/traefik/traefik.yml:/etc/traefik/traefik.yml:ro</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/traefik/acme:/etc/traefik/acme</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/run/docker.sock:/var/run/docker.sock</span>
+    <span class="nt">environment</span><span class="p">:</span>
+      <span class="nt">RFC2136_DNS_TIMEOUT</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">21</span>
+      <span class="c1"># TODO: nameserver to be used for DNS-01 challenge</span>
+      <span class="nt">RFC2136_NAMESERVER</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">192.0.2.53</span>
+      <span class="nt">RFC2136_TSIG_ALGORITHM</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hmac-sha512.</span>
+      <span class="c1"># TODO: tsig key used for auth</span>
+      <span class="nt">RFC2136_TSIG_KEY</span><span class="p">:</span> <span class="p p-Indicator">{{</span> <span class="nv">tsig_key</span> <span class="p p-Indicator">}}</span>
+      <span class="nt">RFC2136_TSIG_SECRET</span><span class="p">:</span> <span class="p p-Indicator">{{</span> <span class="nv">tsig_secret</span> <span class="p p-Indicator">}}</span>
+    <span class="nt">labels</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.enable=true</span>
+
+      <span class="c1"># HOST: publish traefik dashboard</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.rule=Host(`{{ ansible_fqdn }}`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.middlewares=management-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.tls.certResolver=acmeTLS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik.service=api@internal</span>
+
+      <span class="c1"># HOST: publish traefik ping service</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.rule=Host(`{{ ansible_fqdn }}`) &amp;&amp; PathPrefix(`/ping`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.middlewares=endpoint-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.tls.certResolver=acmeTLS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.traefik-ping.service=ping@internal</span>
+
+      <span class="c1"># HOST: publish traefik prometheus metrics</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.rule=Host(`{{ ansible_fqdn }}`) &amp;&amp; PathPrefix(`/metrics`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.middlewares=management-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.tls.certResolver=acmeTLS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.prometheus.service=prometheus@internal</span>
+    <span class="nt">networks</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rp</span>
+    <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+    <span class="nt">logging</span><span class="p">:</span> <span class="nl">&amp;default_logging</span>
+      <span class="nt">driver</span><span class="p">:</span> <span class="s">"json-file"</span>
+      <span class="nt">options</span><span class="p">:</span>
+        <span class="nt">max-size</span><span class="p">:</span> <span class="s">"1M"</span>
+        <span class="nt">max-file</span><span class="p">:</span> <span class="s">"5"</span>
+
+  <span class="c1"># b3lb frontend</span>
+  <span class="nt">django</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ibhde/b3lb:1.1.0</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/logos:/usr/src/app/rest/logos:ro</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/slides:/usr/src/app/rest/slides:ro</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro</span>
+    <span class="nt">environment</span><span class="p">:</span>
+      <span class="c1"># TODO: Adjust number of uvicorn processes!</span>
+      <span class="nt">WEB_CONCURRENCY</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>
+    <span class="nt">labels</span><span class="p">:</span>
+      <span class="c1"># TENANT: /bigbluebutton/api</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.enable=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.rule=HostRegexp(`{tenant:[a-z0-9-]+}.{{ api_base_domain }}`) &amp;&amp; PathPrefix(`/bigbluebutton/api/`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.middlewares=endpoint-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.api.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.api.tls.domains[0].sans=*.{{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api.service=api</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.api.loadbalancer.server.port=8000</span>
+
+      <span class="c1"># GLOBAL: /b3lb/ping</span>
+      <span class="c1"># TENANT: /b3lb/ping</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.rule=(HostRegexp(`{{ api_base_domain }}`) || HostRegexp(`{tenant:[a-z0-9-]+}.{{ api_base_domain }}`)) &amp;&amp; Path(`/b3lb/ping`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.middlewares=endpoint-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.api-ping.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.api-ping.tls.domains[0].sans=*.{{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.api-ping.service=api-ping</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.api-ping.loadbalancer.server.port=8000</span>
+
+      <span class="c1"># TENANT: /b3lb/stats</span>
+      <span class="c1"># TENANT: /b3lb/metrics</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.rule=HostRegexp(`{tenant:[a-z0-9-]+}.{{ api_base_domain }}`) &amp;&amp; (Path(`/b3lb/stats`) || Path(`/b3lb/metrics`))</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.middlewares=endpoint-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.stats.service=stats</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.stats.loadbalancer.server.port=8000</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.stats.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.stats.tls.domains[0].sans=*.{{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+
+      <span class="c1"># GLOBAL: /b3lb/metrics</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.rule=Host(`{{ api_base_domain }}`) &amp;&amp; Path(`/b3lb/metrics`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.middlewares=management-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.b3lb-metrics.service=b3lb-metrics</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.b3lb-metrics.loadbalancer.server.port=8000</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.b3lb-metrics.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.b3lb-metrics.tls.domains[0].sans=*.{{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+
+      <span class="c1"># GLOBAL: /admin/</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.rule=Host(`{{ api_base_domain }}`) &amp;&amp; (PathPrefix(`/admin/`) || Path(`/b3lb/metrics`))</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.middlewares=management-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.admin.service=admin</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.admin.loadbalancer.server.port=8000</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.admin.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.admin.tls.domains[0].sans=*.{{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+    <span class="nt">networks</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rp</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lb</span>
+    <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+    <span class="nt">logging</span><span class="p">:</span>
+      <span class="nt">&lt;&lt;</span><span class="p">:</span> <span class="nv">*default_logging</span>
+
+  <span class="c1"># static assets: logos, slides and Django admin</span>
+  <span class="nt">static</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ibhde/b3lb-static:1.1.0</span>
+    <span class="nt">labels</span><span class="p">:</span>
+      <span class="c1"># Django admin static assets</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.enable=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.static.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.static.rule=Host(`{{ api_base_domain }}`) &amp;&amp; PathPrefix(`/static/`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.static.middlewares=management-chain@file,static-strip</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.static.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.static.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.static.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.middlewares.static-strip.stripprefix.prefixes=/static</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.static.loadbalancer.server.port=8001</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.static.tls.domains[0].main={{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.static.tls.domains[0].sans=*.{{</span><span class="nv"> </span><span class="s">api_base_domain</span><span class="nv"> </span><span class="s">}}"</span>
+
+      <span class="c1"># logo &amp; slide assets</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.enable=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.entrypoints=https</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.rule=Host(`assets.bbbconf.de`)</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.middlewares=endpoint-chain@file</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.tls=true</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.tls.options=default</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.routers.assets.tls.certResolver=acmeDNS</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">traefik.http.services.assets.loadbalancer.server.port=80</span>
+      <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.assets.tls.domains[0].main=assets.bbbconf.de"</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/logos:/usr/share/caddy/logos:ro</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/slides:/usr/share/caddy/slides:ro</span>
+    <span class="nt">networks</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rp</span>
+    <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+    <span class="nt">logging</span><span class="p">:</span>
+      <span class="nt">&lt;&lt;</span><span class="p">:</span> <span class="nv">*default_logging</span>
+
+  <span class="c1"># celery scheduling</span>
+  <span class="nt">celery-beat</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ibhde/b3lb:1.1.0</span>
+    <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">celery-beat</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro</span>
+    <span class="nt">networks</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lb</span>
+    <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+    <span class="nt">logging</span><span class="p">:</span>
+      <span class="nt">&lt;&lt;</span><span class="p">:</span> <span class="nv">*default_logging</span>
+
+  <span class="c1"># celery worker</span>
+  <span class="nt">celery-tasks</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ibhde/b3lb:1.1.0</span>
+    <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">celery-tasks</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./data.d/b3lb/slides:/usr/src/app/rest/slides:ro</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro</span>
+    <span class="nt">networks</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lb</span>
+    <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+    <span class="nt">logging</span><span class="p">:</span>
+      <span class="nt">&lt;&lt;</span><span class="p">:</span> <span class="nv">*default_logging</span>
+
+  <span class="c1"># cache</span>
+  <span class="nt">redis</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">redis:6.0.12-alpine</span>
+    <span class="c1"># TODO: Adjust max memory!</span>
+    <span class="c1"># TODO: Set your redis secret!</span>
+    <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">redis-server --maxmemory 4096mb --maxmemory-policy volatile-lfu --requirepass {{ redis_secret }}</span>
+    <span class="nt">networks</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lb</span>
+    <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+    <span class="nt">logging</span><span class="p">:</span>
+      <span class="nt">&lt;&lt;</span><span class="p">:</span> <span class="nv">*default_logging</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+  <span class="c1"># b3lb internal</span>
+  <span class="nt">lb</span><span class="p">:</span>
+
+  <span class="c1"># reverse proxy</span>
+  <span class="nt">rp</span><span class="p">:</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--2">conf.d/traefik/config.yml</label><div class="tab-content docutils container">
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">http</span><span class="p">:</span>
+  <span class="nt">middlewares</span><span class="p">:</span>
+    <span class="c1"># add security related http headers</span>
+    <span class="c1"># https://doc.traefik.io/traefik/middlewares/headers/#configuration-options</span>
+    <span class="nt">security-headers</span><span class="p">:</span>
+      <span class="nt">headers</span><span class="p">:</span>
+        <span class="nt">frameDeny</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">sslRedirect</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">browserXssFilter</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">contentTypeNosniff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">forceSTSHeader</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">stsSeconds</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">31536000</span>
+        <span class="nt">stsIncludeSubdomains</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">stsPreload</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+    <span class="c1"># prevent search enginge indexing</span>
+    <span class="nt">x-robots-tag</span><span class="p">:</span>
+       <span class="nt">headers</span><span class="p">:</span>
+          <span class="nt">customResponseHeaders</span><span class="p">:</span>
+             <span class="nt">X-Robots-Tag</span><span class="p">:</span> <span class="s">"noindex,</span><span class="nv"> </span><span class="s">nofollow,</span><span class="nv"> </span><span class="s">noarchive,</span><span class="nv"> </span><span class="s">nosnippet,</span><span class="nv"> </span><span class="s">notranslate,</span><span class="nv"> </span><span class="s">noimageindex"</span>
+
+    <span class="c1"># list of ip prefixes allowed to access management and metrics</span>
+    <span class="nt">mgmt-whitelist</span><span class="p">:</span>
+      <span class="nt">ipWhiteList</span><span class="p">:</span>
+        <span class="nt">sourceRange</span><span class="p">:</span>
+          <span class="c1"># TODO: Add your management ip prefixes!</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">127.0.0.0/8</span>
+
+
+    <span class="c1"># middleware chain used for public endpoints</span>
+    <span class="nt">endpoint-chain</span><span class="p">:</span>
+      <span class="nt">chain</span><span class="p">:</span>
+        <span class="nt">middlewares</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">security-headers</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">x-robots-tag</span>
+
+    <span class="c1"># middleware chain used for management endpoints</span>
+    <span class="nt">management-chain</span><span class="p">:</span>
+      <span class="nt">chain</span><span class="p">:</span>
+        <span class="nt">middlewares</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">security-headers</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">x-robots-tag</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">mgmt-whitelist</span>
+
+
+<span class="nt">tls</span><span class="p">:</span>
+  <span class="nt">options</span><span class="p">:</span>
+    <span class="c1"># TLS settings</span>
+    <span class="nt">default</span><span class="p">:</span>
+      <span class="nt">sniStrict</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="nt">minVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">VersionTLS12</span>
+      <span class="nt">preferServerCipherSuites</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="nt">cipherSuites</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305</span>
+      <span class="nt">curvePreferences</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">X25519</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">CurveP521</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">CurveP384</span>
+</pre></div>
+</div>
+</div>
+<input class="tab-input" id="tab-set--0-input--3" name="tab-set--0" type="radio"/><label class="tab-label" for="tab-set--0-input--3">conf.d/traefik/traefik.yml</label><div class="tab-content docutils container">
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># disable traefik call home</span>
+<span class="nt">global</span><span class="p">:</span>
+  <span class="nt">checkNewVersion</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+  <span class="nt">sendAnonymousUsage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="c1"># enable traefik dashboard</span>
+<span class="nt">api</span><span class="p">:</span>
+  <span class="nt">dashboard</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="c1"># enable traefik ping handler</span>
+<span class="nt">ping</span><span class="p">:</span>
+  <span class="nt">manualRouting</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="c1"># enable traefik prometheus metrics export</span>
+<span class="nt">metrics</span><span class="p">:</span>
+  <span class="nt">prometheus</span><span class="p">:</span>
+    <span class="nt">manualRouting</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+
+
+<span class="c1"># entrypoints for http and https</span>
+<span class="nt">entryPoints</span><span class="p">:</span>
+  <span class="nt">http</span><span class="p">:</span>
+    <span class="nt">address</span><span class="p">:</span> <span class="s">":80"</span>
+    <span class="nt">http</span><span class="p">:</span>
+      <span class="nt">redirections</span><span class="p">:</span>
+        <span class="nt">entryPoint</span><span class="p">:</span>
+          <span class="nt">to</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">https</span>
+          <span class="nt">scheme</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">https</span>
+  <span class="nt">https</span><span class="p">:</span>
+    <span class="nt">address</span><span class="p">:</span> <span class="s">":443"</span>
+    <span class="nt">http</span><span class="p">:</span>
+      <span class="nt">tls</span><span class="p">:</span>
+        <span class="nt">options</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+
+<span class="c1"># add docker and file providers</span>
+<span class="nt">providers</span><span class="p">:</span>
+  <span class="nt">docker</span><span class="p">:</span>
+    <span class="nt">endpoint</span><span class="p">:</span> <span class="s">"unix:///var/run/docker.sock"</span>
+    <span class="nt">watch</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">exposedByDefault</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+    <span class="c1"># Needs to match the network name created by</span>
+    <span class="c1"># docker-compose!</span>
+    <span class="nt">network</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">b3lb_rp</span>
+  <span class="nt">file</span><span class="p">:</span>
+    <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/etc/traefik/config.yml</span>
+
+<span class="c1"># frontend certificates</span>
+<span class="nt">certificatesResolvers</span><span class="p">:</span>
+  <span class="nt">acmeDNS</span><span class="p">:</span>
+    <span class="nt">acme</span><span class="p">:</span>
+      <span class="c1"># TODO: Adding an email address is required!</span>
+      <span class="c1">#email:</span>
+      <span class="nt">storage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/etc/traefik/acme/acmeDNS.json</span>
+      <span class="nt">dnsChallenge</span><span class="p">:</span>
+        <span class="nt">provider</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">rfc2136</span>
+
+<span class="c1"># use default logging</span>
+<span class="nt">log</span><span class="p">:</span> <span class="p p-Indicator">{}</span>
+
+<span class="c1"># enable access logging only for failed or high latency requests</span>
+<span class="nt">accessLog</span><span class="p">:</span>
+  <span class="nt">filters</span><span class="p">:</span>
+    <span class="nt">statusCodes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">"400-499"</span>
+      <span class="p p-Indicator">-</span> <span class="s">"500-599"</span>
+    <span class="nt">retryAttempts</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+    <span class="nt">minDuration</span><span class="p">:</span> <span class="s">"500ms"</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
       </article>

@@ -41,7 +41,9 @@ Configuration
 .. hint::
     *redis*  is used in the three different settings ``CACHES``, ``CELERY_BROKER_URL`` and ``CACHEOPS_REDIS``. It is highly recommended to use unique redis database identifiers for each setting.
 
-To create your own ``settings.py`` use the following template::
+To create your own ``settings.py`` use the following template:
+
+.. code-block:: python
 
     from loadbalancer.settings_base import *
 

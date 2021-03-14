@@ -158,6 +158,10 @@
         </label>
         <div class="section" id="prerequisites">
 <h1>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h1>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Some of the examples and templates are containing <em>Jinja2</em>-like variables notations <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">variable_name</span> <span class="pre">}}</span></code> - you need to replace them appropriately if not used with a deployment or template engine (i.e. <em>ansible</em> with <em>Jinja2</em>).</p>
+</div>
 <div class="section" id="docker">
 <h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
 <p>To deploy <em>b3lb</em> you need a running Docker environment:</p>
@@ -172,7 +176,7 @@
 <span id="prerequisites-dns"></span><h2>DNS<a class="headerlink" href="#dns" title="Permalink to this headline">¶</a></h2>
 <p><em>B3LB</em> uses the following domain scheme:</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">api.bbbconf.de</span></code></dt><dd><p>Base domain, use for admin and global metrics access, only</p>
+<dt><code class="docutils literal notranslate"><span class="pre">api.bbbconf.de</span></code></dt><dd><p>Base domain used for admin and global metrics access, only.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">tenant1.api.bbbconf.de</span></code></dt><dd><p>BBB API domain for the tenant <code class="docutils literal notranslate"><span class="pre">tentant1</span></code></p>
 </dd>
@@ -181,14 +185,37 @@
 </dl>
 <p>It is recommended to add corresponding DNS RR using a wildcard to your zone file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">;</span> <span class="n">address</span> <span class="n">records</span> <span class="n">of</span> <span class="n">reverse</span> <span class="n">proxy</span> <span class="n">instances</span>
-<span class="n">api</span>         <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.1</span>
-            <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.2</span>
-            <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.3</span>
-            <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">1</span>
-            <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">2</span>
-            <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">3</span>
+<span class="p">{{</span> <span class="n">api_base_domain</span> <span class="p">}}</span><span class="o">.</span>    <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.1</span>
+                          <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.2</span>
+                          <span class="n">A</span>       <span class="mf">192.0</span><span class="o">.</span><span class="mf">2.3</span>
+                          <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">1</span>
+                          <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">2</span>
+                          <span class="n">AAAA</span>    <span class="mi">2001</span><span class="p">:</span><span class="n">db8</span><span class="p">::</span><span class="mi">3</span>
 <span class="p">;</span> <span class="n">wildcard</span> <span class="n">used</span> <span class="n">by</span> <span class="n">tenants</span>
-<span class="o">*</span>           <span class="n">CNAME</span>   <span class="n">api</span>
+<span class="o">*.</span><span class="p">{{</span> <span class="n">api_base_domain</span> <span class="p">}}</span><span class="o">.</span>  <span class="n">CNAME</span>   <span class="n">api</span>
+</pre></div>
+</div>
+<p>You need to support dynamic zone updates to use wildcard certificates from <em>Let’s’Encrypt</em>. The following example could be used with <em>bind9</em> to create a TSIG update key and allow zone updates.</p>
+<p>The TSIG key can be created using the <em>tsig-keygen</em> binary:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">root@ns:~#</span> tsig-keygen -a hmac-sha512 <span class="s2">"{{ tsig_key }}"</span> &gt; /etc/bind/traefik.key
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">tsig_key</span> <span class="pre">}}</span></code> is the name of the TSIG key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">tsig_secret</span> <span class="pre">}}</span></code> the secret value from the key file</p></li>
+</ul>
+</div>
+<p>Example zone definition:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">include</span> <span class="s">"/etc/bind/traefik.key"</span><span class="p">;</span>
+
+<span class="n">zone</span> <span class="s">"{{ api_base_domain }}"</span> <span class="p">{</span>
+    <span class="n">type</span> <span class="n">master</span><span class="p">;</span>
+    <span class="n">file</span> <span class="s">"{{ api_base_domain }}.zone"</span><span class="p">;</span>
+
+    <span class="n">allow</span><span class="o">-</span><span class="n">update</span> <span class="p">{</span> <span class="n">key</span> <span class="s">"{{ tsig_key }}"</span><span class="p">;</span> <span class="p">};</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 </div>
@@ -196,8 +223,8 @@
 <h2>Reverse Proxy<a class="headerlink" href="#reverse-proxy" title="Permalink to this headline">¶</a></h2>
 <p>A reverse proxy with the following features is required:</p>
 <ul class="simple">
-<li><p>handle wildcard certificates using <a class="reference external" href="https://letsencrypt.org/docs/challenge-types/#dns-01-challenge">LE DNS-01 challenge</a> (<em>recommended</em>)</p></li>
-<li><p>restrict access to selected b3lb urls to protect admin &amp; metrics</p></li>
+<li><p>to get a wildcard certificate from <em>Let’s’Encrypt</em> the use of the <a class="reference external" href="https://letsencrypt.org/docs/challenge-types/#dns-01-challenge">ACME DNS-01 challenge</a> is required (<em>recommended</em>)</p></li>
+<li><p>restrict access to selected <em>b3lb</em> urls to protect admin &amp; metrics</p></li>
 </ul>
 <p><a class="reference external" href="https://github.com/traefik/traefik">traefik</a> has proven to work very well for <em>b3lb</em>.</p>
 </div>
@@ -207,10 +234,6 @@
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>Using PostgreSQL 9.5+ is highly recommended.</p>
-</div>
-<div class="section" id="deployment">
-<h3>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h3>
-<p>In</p>
 </div>
 </div>
 </div>
@@ -268,10 +291,7 @@
 <li><a class="reference internal" href="#docker">Docker</a></li>
 <li><a class="reference internal" href="#dns">DNS</a></li>
 <li><a class="reference internal" href="#reverse-proxy">Reverse Proxy</a></li>
-<li><a class="reference internal" href="#postgresql-database">PostgreSQL Database</a><ul>
-<li><a class="reference internal" href="#deployment">Deployment</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#postgresql-database">PostgreSQL Database</a></li>
 </ul>
 </li>
 </ul>
