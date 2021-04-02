@@ -4,6 +4,8 @@ Django Admin Commands
 The `b3lb` container image provides the following additional django-admin commands:
 
 **addnode**
+    Creates a BBB node and adds it to a existing cluster.
+
     ::
 
         usage: manage.py addnode [-h] --slug SLUG --secret SECRET --cluster CLUSTER [--version] [-v {0,1,2,3}]
@@ -19,6 +21,8 @@ The `b3lb` container image provides the following additional django-admin comman
 
 
 **addsecrets**
+    Generates tenant API sub secrets using random credentials.
+
     ::
 
         usage: manage.py addsecrets [-h] --tenant-slug TENANT_SLUG --sub-id SUB_ID [--version] [-v {0,1,2,3}]
@@ -34,6 +38,8 @@ The `b3lb` container image provides the following additional django-admin comman
 
 
 **checkslides**
+    Synchronizes the slides objects to the existing slide files.
+
     ::
 
         usage: manage.py checkslides [-h] [--version] [-v {0,1,2,3}] [--settings SETTINGS]
@@ -44,6 +50,8 @@ The `b3lb` container image provides the following additional django-admin comman
 
 
 **getloadvalues**
+    Dumps the BBB node's load values.
+
     ::
 
         usage: manage.py getloadvalues [-h] [--version] [-v {0,1,2,3}] [--settings SETTINGS]
@@ -54,6 +62,8 @@ The `b3lb` container image provides the following additional django-admin comman
 
 
 **gettenantsecrets**
+    Dumps all API secrets of a single tenant.
+
     ::
 
         usage: manage.py gettenantsecrets [-h] [--version] [-v {0,1,2,3}] [--settings SETTINGS]
@@ -64,6 +74,8 @@ The `b3lb` container image provides the following additional django-admin comman
 
 
 **listalltenantsecrets**
+    Dumps API secrets of all tenants.
+
     ::
 
         usage: manage.py listalltenantsecrets [-h] [--version] [-v {0,1,2,3}] [--settings SETTINGS]
@@ -74,6 +86,8 @@ The `b3lb` container image provides the following additional django-admin comman
 
 
 **meetingstats**
+    Dump statistics.
+
     ::
 
         usage: manage.py meetingstats [-h] [--version] [-v {0,1,2,3}] [--settings SETTINGS]
