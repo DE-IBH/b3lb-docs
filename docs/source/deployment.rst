@@ -84,7 +84,7 @@ Deployment
 
           # b3lb frontend
           django:
-            image: ibhde/b3lb:1.1.0
+            image: ibhde/b3lb:1.2.0
             volumes:
               - ./data.d/b3lb/logos:/usr/src/app/rest/logos:ro
               - ./data.d/b3lb/slides:/usr/src/app/rest/slides:ro
@@ -164,7 +164,7 @@ Deployment
 
           # static assets: logos, slides and Django admin
           static:
-            image: ibhde/b3lb-static:1.1.0
+            image: ibhde/b3lb-static:1.2.0
             labels:
               # Django admin static assets
               - traefik.enable=true
@@ -200,7 +200,7 @@ Deployment
 
           # celery scheduling
           celery-beat:
-            image: ibhde/b3lb:1.1.0
+            image: ibhde/b3lb:1.2.0
             command: celery-beat
             volumes:
               - ./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro
@@ -212,7 +212,7 @@ Deployment
 
           # celery worker
           celery-tasks:
-            image: ibhde/b3lb:1.1.0
+            image: ibhde/b3lb:1.2.0
             command: celery-tasks
             volumes:
               - ./data.d/b3lb/slides:/usr/src/app/rest/slides:ro
