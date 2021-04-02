@@ -14,6 +14,8 @@ To deploy *b3lb* you need a running Docker environment:
 - Kubernetes
 - ...
 
+This documentation expects to use *Docker Compose* for container deployment.
+
 .. _Prerequisites DNS:
 
 DNS
@@ -74,7 +76,7 @@ Reverse Proxy
 A reverse proxy with the following features is required:
 
 - to get a wildcard certificate from *Let's'Encrypt* the use of the `ACME DNS-01 challenge <https://letsencrypt.org/docs/challenge-types/#dns-01-challenge>`_ is required (*recommended*)
-- restrict access to selected *b3lb* urls to protect admin & metrics
+- access ACLs to protect *b3lb* admin & metrics urls
 
 `traefik <https://github.com/traefik/traefik>`_ has proven to work very well for *b3lb*.
 
