@@ -1,23 +1,9 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
 
 # -- Project information -----------------------------------------------------
 
-project = 'b3lb'
+project = 'B3LB'
 copyright = '2020-2021 IBH IT-Service GmbH'
 author = ''
 
@@ -33,6 +19,7 @@ release = '1.2'
 extensions = [
     "sphinx_copybutton",
     "sphinx_inline_tabs",
+    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -49,27 +36,11 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'furo'
+html_theme = 'sphinx_rtd_theme'
 
 html_theme_options = {
-    "announcement": "<em>Documentation is WIP</em>",
-    "sidebar_hide_name": False,
-    "light_css_variables": {
-        "color-brand-primary": "#D13239",
-        "color-brand-content": "#D13239",
-        "color-announcement-background": "#D13239",
-        "color-sidebar-background": "#002A55",
-        "color-sidebar-search-background": "#002A55",
-        "color-admonition-background": "#002A55",
-    },
-    "dark_css_variables": {
-        "color-brand-primary": "#D13239",
-        "color-brand-content": "#D13239",
-        "color-announcement-background": "#D13239",
-        "color-sidebar-background": "#002A55",
-        "color-sidebar-search-background": "#002A55",
-        "color-admonition-background": "#002A55",
-    },
+    "style_external_links": True,
+    "style_nav_header_background": "#002A55",
 }
 
 html_show_sphinx = False
@@ -78,3 +49,8 @@ html_show_sphinx = False
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Load css overrides.
+html_css_files = [
+    'css/local.css',
+]
