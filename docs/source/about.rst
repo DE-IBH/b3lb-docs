@@ -101,26 +101,29 @@ Each of the metrics is important for deciding where to spawn new meetings. The c
 
   load_{node} = f_{atn} * n_{atn} + f_{mtg} * n_{mtg} + \frac{cpu_{max}}{cpu_{order}} * \sum_{n=1}^{cpu_{order}} {\left[\frac{ \max {\left(cpu_{1m}, cpu_{15s}\right)} }{10.000}\right]}^{n}
 
-The cpu utilization is reinforced using a Taylor polynomial to get a slow increate as long the cpu utilization is below :math:`cpu_{max}`. Above of the thresold the load increases exponential.
+The cpu utilization is reinforced to get a slow increate as long the cpu utilization is low and increases more and more exponential.
 
 .. plot::
 
    import matplotlib.pyplot as plt
    import numpy as np
    x = np.arange(0,10000)
-   y = 0
+   y = 5000/6*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6))
 
-   for n in range(1,6):
-     y += pow(x/10000, n)
-   y *= 5000/6
+   y1 = y + 150 + 10*30
+   y2 = y + 300 + 20*30
+   y3 = y + 450 + 30*30
 
-   y += 150 + 10*30
-
-   plt.plot(x,y)
+   plt.plot(x,y1, label="$\mathregular{n_{atn}=150;n_{mtg}=10}$")
+   plt.plot(x,y2, label="$\mathregular{n_{atn}=300;n_{mtg}=20}$")
+   plt.plot(x,y3, label="$\mathregular{n_{atn}=450;n_{mtg}=30}$")
+   plt.grid()
+   plt.legend()
    plt.xlabel("$\mathregular{\max {(cpu_{1m}, cpu_{15s})}}$")
    plt.ylabel("$\mathregular{load_{node}}$")
-   plt.title("$\mathregular{n_{atn}=150;n_{mtg}=10}$")
+   plt.title("Load Curve")
    plt.show()
+
 
 
 Container Images
