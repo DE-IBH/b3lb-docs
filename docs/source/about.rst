@@ -108,12 +108,13 @@ The cpu utilization is reinforced to get a slow increate as long the cpu utiliza
    import matplotlib.pyplot as plt
    import numpy as np
    x = np.arange(0,10000)
-   y = 5000/6*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6))
+   y0 = 5000/6*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6))
 
-   y1 = y + 150 + 10*30
-   y2 = y + 300 + 20*30
-   y3 = y + 450 + 30*30
+   y1 = y0 + 150 + 10*30
+   y2 = y0 + 300 + 20*30
+   y3 = y0 + 450 + 30*30
 
+   plt.plot(x,y0, label="$\mathregular{n_{atn}=0;n_{mtg}=0}$")
    plt.plot(x,y1, label="$\mathregular{n_{atn}=150;n_{mtg}=10}$")
    plt.plot(x,y2, label="$\mathregular{n_{atn}=300;n_{mtg}=20}$")
    plt.plot(x,y3, label="$\mathregular{n_{atn}=450;n_{mtg}=30}$")
