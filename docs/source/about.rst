@@ -67,25 +67,60 @@ Monitoring
 Load Calculation
 ::::::::::::::::
 
-To select a BBB node for new meetings B3LB calculates a load value for the BBB nodes.
+To select a BBB node for new meetings B3LB calculates a load value for the BBB nodes. The load is based on three metrics:
+
+- number of attendees
+- number of meetings
+- cpu utilization (base 10.000)
+
+Each of the metrics is important for deciding where to spawn new meetings. The cpu utilization depends on the current load caused by running meetings and also respects external effects of the BBB nodes. The number of meetings is important since it is an indicator that more attendees may join and cause even more load in the future.
 
 .. math::
-  \begin{array}{cclc}
-  \mathbf{\text{Variable}} & \mathbf{\text{Default}} & \mathbf{\text{Description}} & \mathbf{\text{Origin}} \\
-  cpu_{15s} & - & \text{cpu utilization in the last 15s} & \text{node} \\
-  cpu_{1m} & - & \text{cpu utilization in the last minute} & \text{node} \\
-  cpu_{max} & 5.000 & \text{target max cpu utilization} & \text{cluster} \\
-  cpu_{order} & 6 & \text{order of Taylor polynomial} & \text{cluster} \\
-  f_{atn} & 1 & \text{load factor for a single attendee} & \text{cluster} \\
-  n_{atn} & - & \text{number of active attendees} & \text{node} \\
-  f_{atn} & 30 & \text{load factor for a single meeting} & \text{cluster} \\
-  n_{mtg} & - & \text{number of active meetings} & \text{node} \\
+  \begin{array}{clc}
+  \mathbf{\text{Metric}} & \mathbf{\text{Description}} & \mathbf{\text{Origin}} \\
+  cpu_{15s} & \text{cpu utilization in the last 15s} & \text{node} \\
+  cpu_{1m} & \text{cpu utilization in the last minute} & \text{node} \\
+  n_{atn} & \text{number of active attendees} & \text{node} \\
+  n_{mtg} & \text{number of active meetings} & \text{node} \\
   \end{array}
 
   \\
   \\
 
-  load = f_{atn} * n_{atn} + f_{mtg} * n_{mtg} + \frac{cpu_{max}}{cpu_{order}} * \sum_{n=1}^{cpu_{order}} {\left[\frac{ max(cpu_{1m}, cpu_{15s})  }{10.000}\right]}^{n}
+  \begin{array}{cclc}
+  \mathbf{\text{Tunable}} & \mathbf{\text{Default}} & \mathbf{\text{Description}} & \mathbf{\text{Origin}} \\
+  cpu_{max} & 5.000 & \text{target max cpu utilization} & \text{cluster} \\
+  cpu_{order} & 6 & \text{order of Taylor polynomial} & \text{cluster} \\
+  f_{atn} & 1 & \text{load factor for a single attendee} & \text{cluster} \\
+  f_{mtg} & 30 & \text{load factor for a single meeting} & \text{cluster} \\
+  \end{array}
+
+
+  \\
+  \\
+
+  load_{node} = f_{atn} * n_{atn} + f_{mtg} * n_{mtg} + \frac{cpu_{max}}{cpu_{order}} * \sum_{n=1}^{cpu_{order}} {\left[\frac{ \max {\left(cpu_{1m}, cpu_{15s}\right)} }{10.000}\right]}^{n}
+
+The cpu utilization is reinforced using a Taylor polynomial to get a slow increate as long the cpu utilization is below :math:`cpu_{max}`. Above of the thresold the load increases exponential.
+
+.. plot::
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+   x = np.arange(0,10000)
+   y = 0
+
+   for n in range(1,6):
+     y += pow(x/10000, n)
+   y *= 5000/6
+
+   y += 150 + 10*30
+
+   plt.plot(x,y)
+   plt.xlabel("$\mathregular{\max {(cpu_{1m}, cpu_{15s})}}$")
+   plt.ylabel("$\mathregular{load_{node}}$")
+   plt.title("$\mathregular{n_{atn}=150;n_{mtg}=10}$")
+   plt.show()
 
 
 Container Images
