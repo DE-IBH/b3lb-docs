@@ -64,6 +64,30 @@ Monitoring
 - prometheus metrics URL
 
 
+Load Calculation
+::::::::::::::::
+
+To select a BBB node for new meetings B3LB calculates a load value for the BBB nodes.
+
+.. math::
+  \begin{array}{cclc}
+  \mathbf{\text{Variable}} & \mathbf{\text{Default}} & \mathbf{\text{Description}} & \mathbf{\text{Origin}} \\
+  cpu_{15s} & - & \text{cpu utilization in the last 15s} & \text{node} \\
+  cpu_{1m} & - & \text{cpu utilization in the last minute} & \text{node} \\
+  cpu_{max} & 5.000 & \text{target max cpu utilization} & \text{cluster} \\
+  cpu_{order} & 6 & \text{order of Taylor polynomial} & \text{cluster} \\
+  f_{atn} & 1 & \text{load factor for a single attendee} & \text{cluster} \\
+  n_{atn} & - & \text{number of active attendees} & \text{node} \\
+  f_{atn} & 30 & \text{load factor for a single meeting} & \text{cluster} \\
+  n_{mtg} & - & \text{number of active meetings} & \text{node} \\
+  \end{array}
+
+  \\
+  \\
+
+  load = f_{atn} * n_{atn} + f_{mtg} * n_{mtg} + \frac{cpu_{max}}{cpu_{order}} * \sum_{n=1}^{cpu_{order}} {\left[\frac{ max(cpu_{1m}, cpu_{15s})  }{10.000}\right]}^{n}
+
+
 Container Images
 ::::::::::::::::
 
