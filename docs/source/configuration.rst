@@ -41,14 +41,18 @@ Configuration
 .. hint::
     *redis*  is used in the three different settings ``CACHES``, ``CELERY_BROKER_URL`` and ``CACHEOPS_REDIS``. It is highly recommended to use unique redis database identifiers for each setting.
 
-To create your own ``settings.py`` use the following template:
+Create your own ``settings.py`` using the following template:
+
+.. hint::
+    You might use the templates with Jinja2 and set the variables ``api_base_domain``, ``assets_domain``, ``db_passwd`` and
+    ``secret_key`` appropriately.
 
 .. code-block:: python
 
     from loadbalancer.settings_base import *
 
     # create a secret key
-    SECRET_KEY = "XXXXXX"
+    SECRET_KEY = "{{ secret_key }}"
 
 
     # Database
@@ -59,20 +63,20 @@ To create your own ``settings.py`` use the following template:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'b3lb',
             'USER': 'b3lb',
-            'PASSWORD': 'XXXXXX',
+            'PASSWORD': '{{ db_passwd }}',
             'HOST': 'db',
             'PORT': '5432',
         }
     }
 
     # Configure Celery
-    CELERY_BROKER_URL = 'redis://:XXXXXX@redis:6379/3"
+    CELERY_BROKER_URL = 'redis://:{{ redis_secret }}@redis:6379/3"
 
     # Django Cache
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://:XXXXXX@redis:6379/1",
+            "LOCATION": "redis://:{{ redis_secret }}@redis:6379/1",
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient"
             },
@@ -80,7 +84,7 @@ To create your own ``settings.py`` use the following template:
     }
 
     # Django ORM Caching
-    CACHEOPS_REDIS = "redis://:XXXXXX@redis:6379/2"
+    CACHEOPS_REDIS = "redis://:{{ redis_secret }}@redis:6379/2"
 
 
     # Internationalization
@@ -92,5 +96,5 @@ To create your own ``settings.py`` use the following template:
 
     # B3LB SETTINGS
 
-    API_BASE_DOMAIN = "api.examples.com"
-    ASSETS_FOLDER_URL = "https://assets.examples.com/logos"
+    API_BASE_DOMAIN = "{{ api_base_domain }}"
+    ASSETS_FOLDER_URL = "https://{{ assets_domain }}/logos"
