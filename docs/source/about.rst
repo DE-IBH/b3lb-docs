@@ -67,11 +67,11 @@ Monitoring
 Load Calculation
 ::::::::::::::::
 
-To select a BBB node for new meetings B3LB calculates a load value for the BBB nodes. The load is based on three metrics:
+To select a BBB node for new meetings B3LB calculates a load value for the BBB nodes. The BBB node with the lowest load value is choosen. The load is based on three metrics:
 
-- number of attendees
-- number of meetings
-- cpu utilization (base 10.000)
+* number of attendees
+* number of meetings
+* cpu utilization (base 10.000)
 
 Each of the metrics is important for deciding where to spawn new meetings. The cpu utilization depends on the current load caused by running meetings and also respects external effects of the BBB nodes. The number of meetings is important since it is an indicator that more attendees may join and cause even more load in the future.
 
@@ -125,7 +125,7 @@ The cpu utilization is reinforced to get a slow increate as long the cpu utiliza
    plt.title("Load Curve")
    plt.show()
 
-Changing the polynomial order regulates if the load balancing is more or less cpu load sensitive.
+Tuning the polynomial order changes the load balancing to be more or less cpu load sensitive:
 
 
 .. plot::
@@ -134,30 +134,24 @@ Changing the polynomial order regulates if the load balancing is more or less cp
    import numpy as np
    x = np.arange(0,10000)
 
-   y0 = 0
+   y0 = 0*x
    y1 = 5000/1*(pow(x/10000, 1))
    y2 = 5000/2*(pow(x/10000, 1) + pow(x/10000, 2))
-   y3 = 5000/3*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3))
    y4 = 5000/4*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4))
-   y5 = 5000/5*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5))
    y6 = 5000/6*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6))
-   y7 = 5000/7*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6) + pow(x/10000, 7))
    y8 = 5000/8*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6) + pow(x/10000, 7) + pow(x/10000, 8))
 
-   plt.plot(x,y0, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y1, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y2, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y3, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y4, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y5, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y6, label="$\mathregular{cpu_{order}=0$ (default)", linewidth=2)
-   plt.plot(x,y7, label="$\mathregular{cpu_{order}=0$")
-   plt.plot(x,y8, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x, y0, label="$\mathregular{cpu_{order}=0}$")
+   plt.plot(x, y1, label="$\mathregular{cpu_{order}=1}$")
+   plt.plot(x, y2, label="$\mathregular{cpu_{order}=2}$")
+   plt.plot(x, y4, label="$\mathregular{cpu_{order}=4}$")
+   plt.plot(x, y6, label="$\mathregular{cpu_{order}=6}$ (default)", linewidth=4)
+   plt.plot(x, y8, label="$\mathregular{cpu_{order}=8}$")
    plt.grid()
    plt.legend()
    plt.xlabel("$\mathregular{\max {(cpu_{1m}, cpu_{15s})}}$")
    plt.ylabel("$\mathregular{load_{node}}$")
-   plt.title("Load Curve")
+   plt.title("Load Curve vs. Polynomial Order")
    plt.show()
 
 
