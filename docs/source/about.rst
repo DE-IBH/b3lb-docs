@@ -90,7 +90,7 @@ Each of the metrics is important for deciding where to spawn new meetings. The c
   \begin{array}{cclc}
   \mathbf{\text{Tunable}} & \mathbf{\text{Default}} & \mathbf{\text{Description}} & \mathbf{\text{Origin}} \\
   cpu_{max} & 5.000 & \text{target max cpu utilization} & \text{cluster} \\
-  cpu_{order} & 6 & \text{order of Taylor polynomial} & \text{cluster} \\
+  cpu_{order} & 6 & \text{order of the polynomial} & \text{cluster} \\
   f_{atn} & 1 & \text{load factor for a single attendee} & \text{cluster} \\
   f_{mtg} & 30 & \text{load factor for a single meeting} & \text{cluster} \\
   \end{array}
@@ -101,7 +101,7 @@ Each of the metrics is important for deciding where to spawn new meetings. The c
 
   load_{node} = f_{atn} * n_{atn} + f_{mtg} * n_{mtg} + \frac{cpu_{max}}{cpu_{order}} * \sum_{n=1}^{cpu_{order}} {\left[\frac{ \max {\left(cpu_{1m}, cpu_{15s}\right)} }{10.000}\right]}^{n}
 
-The cpu utilization is reinforced to get a slow increate as long the cpu utilization is low and increases more and more exponential.
+The cpu utilization is reinforced to get a slow increate as long the cpu utilization is low and increases more and more exponential. The following plot shows the load value for a BBB node depending on it's CPU utilization (base 10.000) for different attendee and meeting counts.
 
 .. plot::
 
@@ -125,6 +125,40 @@ The cpu utilization is reinforced to get a slow increate as long the cpu utiliza
    plt.title("Load Curve")
    plt.show()
 
+Changing the polynomial order regulates if the load balancing is more or less cpu load sensitive.
+
+
+.. plot::
+
+   import matplotlib.pyplot as plt
+   import numpy as np
+   x = np.arange(0,10000)
+
+   y0 = 0
+   y1 = 5000/1*(pow(x/10000, 1))
+   y2 = 5000/2*(pow(x/10000, 1) + pow(x/10000, 2))
+   y3 = 5000/3*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3))
+   y4 = 5000/4*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4))
+   y5 = 5000/5*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5))
+   y6 = 5000/6*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6))
+   y7 = 5000/7*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6) + pow(x/10000, 7))
+   y8 = 5000/8*(pow(x/10000, 1) + pow(x/10000, 2) + pow(x/10000, 3) + pow(x/10000, 4) + pow(x/10000, 5) + pow(x/10000, 6) + pow(x/10000, 7) + pow(x/10000, 8))
+
+   plt.plot(x,y0, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y1, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y2, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y3, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y4, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y5, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y6, label="$\mathregular{cpu_{order}=0$ (default)", linewidth=2)
+   plt.plot(x,y7, label="$\mathregular{cpu_{order}=0$")
+   plt.plot(x,y8, label="$\mathregular{cpu_{order}=0$")
+   plt.grid()
+   plt.legend()
+   plt.xlabel("$\mathregular{\max {(cpu_{1m}, cpu_{15s})}}$")
+   plt.ylabel("$\mathregular{load_{node}}$")
+   plt.title("Load Curve")
+   plt.show()
 
 
 Container Images
