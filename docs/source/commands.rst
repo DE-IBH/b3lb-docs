@@ -1,5 +1,5 @@
-Django Admin Commands
-=====================
+CLI Commands
+============
 
 The `b3lb` container image provides the following additional django-admin commands:
 
