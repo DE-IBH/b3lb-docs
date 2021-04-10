@@ -25,5 +25,5 @@ This documentation is licensed under the Creative Commons Attribution-ShareAlike
    prerequisites
    configuration
    deployment
-   steps
+   admin
    commands
