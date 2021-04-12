@@ -101,7 +101,7 @@ Each of the metrics is important for deciding where to spawn new meetings. The c
 
   load_{node} = f_{atn} * n_{atn} + f_{mtg} * n_{mtg} + \frac{cpu_{max}}{cpu_{order}} * \sum_{n=1}^{cpu_{order}} {\left[\frac{ \max {\left(cpu_{1m}, cpu_{15s}\right)} }{10.000}\right]}^{n}
 
-The cpu utilization is reinforced to get a slow increate as long the cpu utilization is low and increases more and more exponential. The following plot shows the load value for a BBB node depending on it's CPU utilization (base 10.000) for different attendee and meeting counts.
+The cpu utilization is reinforced to get a slow increase as long the cpu utilization is low and increases more and more steep. The following plot shows the load value for a BBB node depending on it's CPU utilization (base 10.000) for different attendee and meeting counts.
 
 .. plot::
 
