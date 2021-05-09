@@ -35,8 +35,10 @@ __________________
   checks the health of *B3LB* including database access
 
 ``https://api.bbbconf.de/b3lb/metrics``
+  global Prometheus metrics
+
 ``https://api.bbbconf.de/b3lb/stats``
-  global metrics and JSON statistics
+  global JSON statistics
 
 ``https://tenant1.api.bbbconf.de/bigbluebutton/``
   BBB API URL for the tenant ``tentant1``
@@ -93,8 +95,10 @@ A single domain name can be used if the use of a wildcard DNS entry is not possi
   checks the health of *B3LB* including database access
 
 ``https://api.bbbconf.de/b3lb/metrics``
+  global Prometheus metrics
+
 ``https://api.bbbconf.de/b3lb/stats``
-  global metrics and JSON statistics
+  global JSON statistics
 
 ``https://api.bbbconf.de/b3lb/t/tenant1/bbb/``
   BBB API URL for the tenant ``tentant1``
