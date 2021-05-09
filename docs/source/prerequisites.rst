@@ -18,10 +18,10 @@ This documentation expects to use *Docker Compose* for single host container dep
 
 .. _Prerequisites DNS:
 
-DNS for BBB API
----------------
+DNS
+---
 
-The BBB API from *B3LB* can be used with a wildcard DNS entry as well as with a single domain and different URL paths. A wildcard DNS entry is recommended as it is most similar to a standalone BBB server. Both variants can be used at the same time.
+The BBB API of *B3LB* can be used with a wildcard DNS entry as well as with a single domain and different URL paths. A wildcard DNS entry is recommended as it is most similar to a standalone BBB server. Both variants can be used at the same time.
 
 Wildcard DNS Entry
 __________________
