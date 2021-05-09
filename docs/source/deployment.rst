@@ -14,7 +14,7 @@ Deployment
 
 
 .. hint::
-    You need at least to change the options tagged with ``TODO:`` in the following templates. You might use the templates with Jinja2 and set the variables ``ansible_fqdn``, ``api_base_domain``, ``assets_domain``, ``tsig_key`` and ``tsig_secret`` appropriately.
+    You need at least to change the options tagged with ``TODO:`` in the following templates. You might use the templates with Jinja2 and set the variables ``ansible_fqdn``, ``api_base_domain``, ``assets_domain``, ``tsig_key`` and ``tsig_secret`` appropriately. For single domain name setups you need to update the traefik rules labels and change the certificat resolver setting to ``traefik.http.routers.*.tls.certResolver=acmeTLS``.
 
 
 .. tab:: docker-compose.yml
@@ -175,20 +175,6 @@ Deployment
               - traefik.http.services.static.loadbalancer.server.port=8001
               - "traefik.http.routers.static.tls.domains[0].main={{ api_base_domain }}"
               - "traefik.http.routers.static.tls.domains[0].sans=*.{{ api_base_domain }}"
-
-              # logo & slide assets
-              - traefik.enable=true
-              - traefik.http.routers.assets.entrypoints=https
-              - traefik.http.routers.assets.rule=Host(`{{ assets_domain }}`)
-              - traefik.http.routers.assets.middlewares=endpoint-chain@file
-              - traefik.http.routers.assets.tls=true
-              - traefik.http.routers.assets.tls.options=default
-              - traefik.http.routers.assets.tls.certResolver=acmeDNS
-              - traefik.http.services.assets.loadbalancer.server.port=80
-              - "traefik.http.routers.assets.tls.domains[0].main={{ assets_domain }}"
-            volumes:
-              - ./data.d/b3lb/logos:/usr/share/caddy/logos:ro
-              - ./data.d/b3lb/slides:/usr/share/caddy/slides:ro
             networks:
               - rp
             restart: always
@@ -210,6 +196,18 @@ Deployment
           # celery worker
           celery-tasks:
             image: ibhde/b3lb:2.0.1
+            #
+            # ---==] PyPy [==---
+            #
+            # Consider to change to PyPy if the processing speed is to slow.
+            # You need to replace the image and add a reasonable high cgroup
+            # memory limit:
+            #
+            # image: ibhde/b3lb-pypy:2.0.1
+            # mem_limit: 10g
+            #
+            # ---==] PyPy [==---
+            #
             command: celery-tasks
             env_file:
               - ./conf.d/b3lb/env
@@ -320,6 +318,11 @@ Deployment
         api:
           dashboard: true
 
+        # fix traefik's dashboard privacy issue
+        # (https://github.com/traefik/traefik/issues/7699)
+        pilot:
+          dashboard: false
+
         # enable traefik ping handler
         ping:
           manualRouting: true
@@ -359,6 +362,7 @@ Deployment
 
         # frontend certificates
         certificatesResolvers:
+          # required for wildcard DNS entries
           acmeDNS:
             acme:
               # TODO: Adding an email address is required!
@@ -366,6 +370,13 @@ Deployment
               storage: /etc/traefik/acme/acmeDNS.json
               dnsChallenge:
                 provider: rfc2136
+          #  sufficient for single domain name setups
+          acmeTLS:
+            acme:
+              # TODO: Adding an email address is required!
+              #email:
+              storage: /etc/traefik/acme/acmeTLS.json
+              tlsChallenge: {}
 
         # use default logging
         log: {}

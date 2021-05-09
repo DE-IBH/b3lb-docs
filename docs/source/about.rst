@@ -203,6 +203,26 @@ assets for the Django admin UI and can be used to publish per-tenant assets.
         docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-static:2.0.1
 
 
+b3lb-pypy
+-----------
+
+This image contains the Django files of b3lb and uses `PyPy <https://www.pypy.org/>_` instead of CPython. This boosts the performance for the celery worker if the need to process a huge number of nodes or attendees.
+
+.. tab:: Docker Hub
+
+    ::
+
+        docker pull ibhde/b3lb-pypy:2.0.1
+
+
+.. tab:: GitHub Packages
+
+    ::
+
+        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-pypy:2.0.1
+
+.. warning::
+    It is recommended to use *b3lb-pypy* for the celery workers, only. It is not well-tested for any other task and is known to waste memory. You should run it only with cgroup based memory limits engaged to prevent excessive memory swapping or OOM killing.
 
 b3lb-dev
 --------
