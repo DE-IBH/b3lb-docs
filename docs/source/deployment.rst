@@ -26,7 +26,7 @@ Deployment
         services:
           # reverse proxy
           traefik:
-            image: traefik:2.4.7
+            image: traefik:2.4.8
             read_only: true
             ports:
               - 80:80
@@ -84,19 +84,15 @@ Deployment
 
           # b3lb frontend
           django:
-            image: ibhde/b3lb:1.2.0
-            volumes:
-              - ./data.d/b3lb/logos:/usr/src/app/rest/logos:ro
-              - ./data.d/b3lb/slides:/usr/src/app/rest/slides:ro
-              - ./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro
-            environment:
-              # TODO: Adjust number of uvicorn processes!
-              WEB_CONCURRENCY: 4
+            image: ibhde/b3lb:2.0,1
+            env_file:
+              - ./conf.d/b3lb/env
             labels:
               # TENANT: /bigbluebutton/api
+              #         /b3lb/t/TENANT/bbb/api
               - traefik.enable=true
               - traefik.http.routers.api.entrypoints=https
-              - traefik.http.routers.api.rule=HostRegexp(`{tenant:[a-z0-9-]+}.{{ api_base_domain }}`) && PathPrefix(`/bigbluebutton/api/`)
+              - traefik.http.routers.b3lb-api.rule=(HostRegexp(`{[a-z0-9-]+}.{{ api_base_domain }}`) && PathPrefix(`/bigbluebutton/api/`)) || (Host(`{{ api_base_domain }}`) && PathPrefix(`/b3lb/t/{[a-z0-9-]+}/bbb/api/`))
               - traefik.http.routers.api.middlewares=endpoint-chain@file
               - traefik.http.routers.api.tls=true
               - traefik.http.routers.api.tls.options=default
@@ -105,6 +101,19 @@ Deployment
               - "traefik.http.routers.api.tls.domains[0].sans=*.{{ api_base_domain }}"
               - traefik.http.routers.api.service=api
               - traefik.http.services.api.loadbalancer.server.port=8000
+
+              # TENANT: /b3lb/t/TENANT/logo
+              #         /b3lb/t/TENANT/slide
+              - traefik.http.routers.b3lb-assets.entrypoints=https
+              - traefik.http.routers.b3lb-assets.rule=Host(`{{ api_base_domain }}`) && Path(`/b3lb/t/{[a-z0-9-]+}/logo`, `/b3lb/t/{[a-z0-9-]+}/slide`)
+              - traefik.http.routers.b3lb-assets.middlewares=endpoint-chain@file
+              - traefik.http.routers.b3lb-assets.tls=true
+              - traefik.http.routers.b3lb-assets.tls.options=default
+              - traefik.http.routers.b3lb-assets.tls.certResolver=acmeDNS
+              - traefik.http.routers.b3lb-assets.service=b3lb-assets
+              - traefik.http.services.b3lb-assets.loadbalancer.server.port=8000
+              - "traefik.http.routers.b3lb-assets.tls.domains[0].main={{ api_base_domain }}"
+              - "traefik.http.routers.b3lb-assets.tls.domains[0].sans=*.{{ api_base_domain }}"
 
               # GLOBAL: /b3lb/ping
               # TENANT: /b3lb/ping
@@ -122,7 +131,7 @@ Deployment
               # TENANT: /b3lb/stats
               # TENANT: /b3lb/metrics
               - traefik.http.routers.stats.entrypoints=https
-              - traefik.http.routers.stats.rule=HostRegexp(`{tenant:[a-z0-9-]+}.{{ api_base_domain }}`) && (Path(`/b3lb/stats`) || Path(`/b3lb/metrics`))
+              - traefik.http.routers.b3lb-stats.rule=(HostRegexp(`{[a-z0-9-]+}.{{ api_base_domain }}`) && Path(`/b3lb/stats`, `/b3lb/metrics`)) || (Host(`{{ api_base_domain }}`) && Path(`/b3lb/t/{[a-z0-9-]+}/stats`, `/b3lb/t/{[a-z0-9-]+}/metrics`))
               - traefik.http.routers.stats.middlewares=endpoint-chain@file
               - traefik.http.routers.stats.tls=true
               - traefik.http.routers.stats.tls.options=default
@@ -132,21 +141,9 @@ Deployment
               - "traefik.http.routers.stats.tls.domains[0].main={{ api_base_domain }}"
               - "traefik.http.routers.stats.tls.domains[0].sans=*.{{ api_base_domain }}"
 
-              # GLOBAL: /b3lb/metrics
-              - traefik.http.routers.b3lb-metrics.entrypoints=https
-              - traefik.http.routers.b3lb-metrics.rule=Host(`{{ api_base_domain }}`) && Path(`/b3lb/metrics`)
-              - traefik.http.routers.b3lb-metrics.middlewares=management-chain@file
-              - traefik.http.routers.b3lb-metrics.tls=true
-              - traefik.http.routers.b3lb-metrics.tls.options=default
-              - traefik.http.routers.b3lb-metrics.tls.certResolver=acmeDNS
-              - traefik.http.routers.b3lb-metrics.service=b3lb-metrics
-              - traefik.http.services.b3lb-metrics.loadbalancer.server.port=8000
-              - "traefik.http.routers.b3lb-metrics.tls.domains[0].main={{ api_base_domain }}"
-              - "traefik.http.routers.b3lb-metrics.tls.domains[0].sans=*.{{ api_base_domain }}"
-
-              # GLOBAL: /admin/
+              # GLOBAL: /admin/ /files/ /b3lb/metrics
               - traefik.http.routers.admin.entrypoints=https
-              - traefik.http.routers.admin.rule=Host(`{{ api_base_domain }}`) && (PathPrefix(`/admin/`) || Path(`/b3lb/metrics`))
+              - traefik.http.routers.b3lb-admin.rule=Host(`{{ api_base_domain }}`) && (PathPrefix(`/admin/`, `/files/`) || Path(`/b3lb/metrics`))
               - traefik.http.routers.admin.middlewares=management-chain@file
               - traefik.http.routers.admin.tls=true
               - traefik.http.routers.admin.tls.options=default
@@ -164,7 +161,7 @@ Deployment
 
           # static assets: logos, slides and Django admin
           static:
-            image: ibhde/b3lb-static:1.2.0
+            image: ibhde/b3lb-static:2.0.1
             labels:
               # Django admin static assets
               - traefik.enable=true
@@ -200,10 +197,10 @@ Deployment
 
           # celery scheduling
           celery-beat:
-            image: ibhde/b3lb:1.2.0
+            image: ibhde/b3lb:2.0.1
             command: celery-beat
-            volumes:
-              - ./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro
+            env_file:
+              - ./conf.d/b3lb/env
             networks:
               - lb
             restart: always
@@ -212,11 +209,10 @@ Deployment
 
           # celery worker
           celery-tasks:
-            image: ibhde/b3lb:1.2.0
+            image: ibhde/b3lb:2.0.1
             command: celery-tasks
-            volumes:
-              - ./data.d/b3lb/slides:/usr/src/app/rest/slides:ro
-              - ./conf.d/b3lb/settings.py:/usr/src/app/loadbalancer/settings.py:ro
+            env_file:
+              - ./conf.d/b3lb/env
             networks:
               - lb
             restart: always
