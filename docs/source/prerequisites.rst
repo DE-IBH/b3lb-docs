@@ -2,7 +2,7 @@ Prerequisites
 =============
 
 .. hint::
-  Some of the examples and templates are containing *Jinja2*-like variables notations ``{{ variable_name }}`` - you need to replace them appropriately if not used with a deployment or template engine (i.e. *ansible* with *Jinja2*).
+  Some of the examples and templates are containing *Jinja2*-like variables notations ``{{ variable_name }}`` - you need to replace them appropriately if not used with a deployment or template engine like *ansible* with *Jinja2*.
 
 Docker
 ------
@@ -14,23 +14,35 @@ To deploy *b3lb* you need a running Docker environment:
 - Kubernetes
 - ...
 
-This documentation expects to use *Docker Compose* for container deployment.
+This documentation expects to use *Docker Compose* for single host container deployment.
 
 .. _Prerequisites DNS:
 
-DNS
----
+DNS for BBB API
+---------------
+
+The BBB API from *B3LB* can be used with a wildcard DNS entry as well as with a single domain and different URL paths. A wildcard DNS entry is recommended as it is most similar to a standalone BBB server. Both variants can be used at the same time.
+
+Wildcard DNS Entry
+__________________
 
 *B3LB* uses the following domain scheme:
 
-``api.bbbconf.de``
-  Base domain used for admin and global metrics access, only.
+``https://api.bbbconf.de/admin/``
+  the *Django Admin*
 
-``tenant1.api.bbbconf.de``
-  BBB API domain for the tenant ``tentant1``
+``https://api.bbbconf.de/b3lb/ping``
+  checks the health of *B3LB* including database access
 
-``tenant1-001.api.bbbconf.de``
-  BBB API domain for a additional secret for the tenant ``tentant1``
+``https://api.bbbconf.de/b3lb/metrics``
+``https://api.bbbconf.de/b3lb/stats``
+  global metrics and JSON statistics
+
+``https://tenant1.api.bbbconf.de/bigbluebutton/``
+  BBB API URL for the tenant ``tentant1``
+
+``https://tenant1-001.api.bbbconf.de/bigbluebutton/``
+  BBB API URL for a additional secret for the tenant ``tentant1``
 
 It is recommended to add corresponding DNS RR using a wildcard to your zone file::
 
@@ -68,6 +80,27 @@ Example zone definition:
 
       allow-update { key "{{ tsig_key }}"; };
   };
+
+Single Domain Name
+__________________
+
+A single domain name can be used if the use of a wildcard DNS entry is not possible or not desired. The following URL patterns are used::
+
+``https://api.bbbconf.de/admin/``
+  the *Django Admin*
+
+``https://api.bbbconf.de/b3lb/ping``
+  checks the health of *B3LB* including database access
+
+``https://api.bbbconf.de/b3lb/metrics``
+``https://api.bbbconf.de/b3lb/stats``
+  global metrics and JSON statistics
+
+``https://api.bbbconf.de/b3lb/t/tenant1/bbb/``
+  BBB API URL for the tenant ``tentant1``
+
+``https://api.bbbconf.de/b3lb/t/tenant1-001/bbb/``
+  BBB API URL for a additional secret for the tenant ``tentant1``
 
 
 Reverse Proxy
