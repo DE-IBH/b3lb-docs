@@ -163,8 +163,8 @@ B3LB provides in three different docker image provided on `Quay.io <https://quay
 .. hint::
     It is intentional that there are no `b3lb:latest` nor `b3lb-static:latest` image tags available. You should always pick a explicit version for your deployment.
 
-.. hint::
-    Since Docker has stopped to support OSS we did not provide images on *Docker Hub* any more.
+.. warning::
+    Since Docker has stopped to support OSS no images on *Docker Hub* are  provided any more for b3lb ≥2.2.1!
 
 
 b3lb
