@@ -84,7 +84,7 @@ Deployment
 
           # b3lb frontend
           django:
-            image: ibhde/b3lb:2.0,1
+            image: quay.io/ibh/b3lb:2.2.1
             env_file:
               - ./conf.d/b3lb/env
             labels:
@@ -161,7 +161,7 @@ Deployment
 
           # static assets: logos, slides and Django admin
           static:
-            image: ibhde/b3lb-static:2.0.1
+            image: quay.io/ibh/b3lb-static:2.2.1
             labels:
               # Django admin static assets
               - traefik.enable=true
@@ -183,7 +183,7 @@ Deployment
 
           # celery scheduling
           celery-beat:
-            image: ibhde/b3lb:2.0.1
+            image: quay.io/ibh/b3lb:2.2.1
             command: celery-beat
             env_file:
               - ./conf.d/b3lb/env
@@ -195,7 +195,7 @@ Deployment
 
           # celery worker
           celery-tasks:
-            image: ibhde/b3lb:2.0.1
+            image: quay.io/ibh/b3lb:2.2.1
             #
             # ---==] PyPy [==---
             #
@@ -203,7 +203,7 @@ Deployment
             # You need to replace the image and add a reasonable high cgroup
             # memory limit:
             #
-            # image: ibhde/b3lb-pypy:2.0.1
+            # image: quay.io/ibh/b3lb-pypy:2.2.1
             # mem_limit: 10g
             #
             # ---==] PyPy [==---
