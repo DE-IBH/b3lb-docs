@@ -177,14 +177,14 @@ the ASGI application, Celery tasks and manamgenet CLI commands.
 
     ::
 
-        docker pull quay.io/ibh/b3lb:2.2.1
+        docker pull quay.io/ibh/b3lb:2.2.2
 
 
 .. tab:: GitHub Packages
 
     ::
 
-        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb:2.2.1
+        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb:2.2.2
 
 
 b3lb-static
@@ -197,14 +197,14 @@ assets for the Django admin UI and can be used to publish per-tenant assets.
 
     ::
 
-        docker pull quay.io/ibh/b3lb-static:2.2.1
+        docker pull quay.io/ibh/b3lb-static:2.2.2
 
 
 .. tab:: GitHub Packages
 
     ::
 
-        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-static:2.2.1
+        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-static:2.2.2
 
 
 b3lb-pypy
@@ -216,14 +216,14 @@ This image contains the Django files of b3lb and uses `PyPy <https://www.pypy.or
 
     ::
 
-        docker pull quay.io/ibh/b3lb-pypy:2.2.1
+        docker pull quay.io/ibh/b3lb-pypy:2.2.2
 
 
 .. tab:: GitHub Packages
 
     ::
 
-        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-pypy:2.2.1
+        docker pull docker.pkg.github.com/de-ibh/b3lb/b3lb-pypy:2.2.2
 
 .. warning::
     It is recommended to use *b3lb-pypy* for the celery workers, only. It is not well-tested for any other task and is known to waste memory. You should run it only with cgroup based memory limits engaged to prevent excessive memory swapping or OOM killing.

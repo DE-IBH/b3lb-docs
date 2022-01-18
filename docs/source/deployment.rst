@@ -26,7 +26,7 @@ Deployment
         services:
           # reverse proxy
           traefik:
-            image: traefik:2.4.8
+            image: traefik:2.5.6
             read_only: true
             ports:
               - 80:80
@@ -84,7 +84,7 @@ Deployment
 
           # b3lb frontend
           django:
-            image: quay.io/ibh/b3lb:2.2.1
+            image: quay.io/ibh/b3lb:2.2.2
             env_file:
               - ./conf.d/b3lb/env
             labels:
@@ -161,7 +161,7 @@ Deployment
 
           # static assets: logos, slides and Django admin
           static:
-            image: quay.io/ibh/b3lb-static:2.2.1
+            image: quay.io/ibh/b3lb-static:2.2.2
             labels:
               # Django admin static assets
               - traefik.enable=true
@@ -183,7 +183,7 @@ Deployment
 
           # celery scheduling
           celery-beat:
-            image: quay.io/ibh/b3lb:2.2.1
+            image: quay.io/ibh/b3lb:2.2.2
             command: celery-beat
             env_file:
               - ./conf.d/b3lb/env
@@ -195,7 +195,7 @@ Deployment
 
           # celery worker
           celery-tasks:
-            image: quay.io/ibh/b3lb:2.2.1
+            image: quay.io/ibh/b3lb:2.2.2
             #
             # ---==] PyPy [==---
             #
@@ -203,7 +203,7 @@ Deployment
             # You need to replace the image and add a reasonable high cgroup
             # memory limit:
             #
-            # image: quay.io/ibh/b3lb-pypy:2.2.1
+            # image: quay.io/ibh/b3lb-pypy:2.2.2
             # mem_limit: 10g
             #
             # ---==] PyPy [==---
@@ -219,7 +219,7 @@ Deployment
 
           # cache
           redis:
-            image: redis:6.0.12-alpine
+            image: redis:6.0.16-alpine
             # TODO: Adjust max memory!
             # TODO: Set your redis secret!
             command: redis-server --maxmemory 4096mb --maxmemory-policy volatile-lfu --requirepass {{ redis_secret }}
